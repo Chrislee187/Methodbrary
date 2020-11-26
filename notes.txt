@@ -1,0 +1,27 @@
+# Overview - EMMA (Extension Method MAnager)
+(see also: trello)
+
+Visual Studio/VS Code add-ins that allow searching an Extension Method Library (EML) for Extension Methods based on the method name but also method signature. e.g. the ability to find the methods that take a ‘string’ and return a ‘float’.
+
+## Extension Method Library
+EML’s can contain multiple Extension Method Source’s (EMS’s). Extension Method Source’s may come from the following types;
+One or more .NET Library DLL’s
+One or more .cs files
+One or more .vb files
+
+These files may be found in either filesystems, web-downloads or web-resources (i.e. github folders/source file pages)
+
+### Local EMS
+By default, every project will have dynamic EMS containing pre-existing Extension Methods scoped to the current project.
+
+### Global EMS
+A library can also contain references to Global Method Source’s, they are configured in the EMM Settings and are made available to every project’s EML.
+It is envisioned that a single global EMS will be available via git-hub to act as a central repository for common extension methods.
+
+### Project EMS
+Contains references to external sources (such as git hub) for use specifically with this project
+
+Adding new resources to a library should be as simple as adding a file/URL reference in a settings dialog.
+
+
+
