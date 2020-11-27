@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using Shouldly;
 
@@ -9,62 +11,36 @@ namespace Emma.Core.Tests
     {
 
         [Test]
-        public void TypeExtension_IsStaticWorks()
+        public void Can_identify_static_classes()
         {
-            var type = typeof(SampleExtensionsClass);
-
-            type.IsStatic().ShouldBeTrue();
+            typeof(SampleExtensionsClass).IsStatic().ShouldBeTrue();
+            typeof(NonStaticSampleClass).IsStatic().ShouldBeFalse();
+        }
+        
+        [Test]
+        public void Can_identify_all_extension_methods_in_class()
+        {
+            typeof(SampleExtensionsClass)
+                .ExtensionMethods()
+                .Count().ShouldBe(3);
         }
 
-
         [Test]
-        public void TypeExtension_FindsExtensionMethodsInType()
+        public void Can_identify_all_extension_methods_in_assembly()
         {
-            var type = typeof(SampleExtensionsClass);
-
-            var extensionMethodInfos = type
+            typeof(SampleExtensionsClass)
+                .Assembly
                 .ExtensionMethods()
-                .Select(ExtensionMethodParser.Parse)
-                .ToList();
+                .Count().ShouldBe(5);
 
-            extensionMethodInfos.Count().ShouldBe(3);
-            
+        }
+
+        private static void DumpExtensionMethods(List<ExtensionMethod> extensionMethodInfos)
+        {
             foreach (var mi in extensionMethodInfos)
             {
                 Console.WriteLine($"{mi}");
             }
         }
-
-        [Test]
-        public void TypeExtension_FindsAllExtensionsInAssembly()
-        {
-            var type = typeof(SampleExtensionsClass);
-
-            var extensionMethodInfos = type.Assembly
-                .ExtensionMethods()
-                .ToList();
-
-            extensionMethodInfos.Count().ShouldBe(5);
-
-        }
-
-        [Test]
-        public void TypeExtension_IgnoresNonStaticClasses()
-        {
-            var type = typeof(NonStaticSampleClass);
-
-            var extensionMethodInfos = type
-                .ExtensionMethods()
-                .ToList();
-
-            extensionMethodInfos.Count().ShouldBe(0);
-
-        }
-
-    }
-
-    public class NonStaticSampleClass
-    {
-
     }
 }
