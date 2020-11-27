@@ -1,9 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using NUnit.Framework;
-using Shouldly;
 
 namespace Emma.Core.Tests
 {
@@ -16,7 +14,7 @@ namespace Emma.Core.Tests
         }
 
         [Test]
-        public void Can_parse_type()
+        public void Can_parse_Type()
         {
             var type = typeof(SampleExtensionsClass);
 
@@ -32,7 +30,7 @@ namespace Emma.Core.Tests
         }
 
         [Test]
-        public void Can_parse_assembly()
+        public void Can_parse_Assembly()
         {
             var type = typeof(SampleExtensionsClass);
             

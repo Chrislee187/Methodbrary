@@ -1,12 +1,9 @@
-using System;
-using System.Linq;
 using System.Text;
 
 namespace Emma.Core
 {
     public class ExtensionMethod
     {
-        public readonly string Container;
         public readonly string Name;
         public readonly string ExtendingType;
         public readonly string ReturnType;
