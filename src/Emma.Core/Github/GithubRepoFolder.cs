@@ -35,7 +35,6 @@ namespace Emma.Core.Github
 
         private bool _folderReadFromGit = false;
         private readonly GitHubClient _github;
-        private string _githubAppKey;
 
         public GithubRepoFolder(string user, string repo, string path, GitHubClient github)
         {
@@ -50,7 +49,6 @@ namespace Emma.Core.Github
         }
         public GithubRepoFolder(string user, string repo, string githubAppKey, string path = null)
         {
-            _githubAppKey = githubAppKey;
             User = user;
             Repo = repo;
             Path = path;
