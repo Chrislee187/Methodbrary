@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using Emma.Core.Extensions;
+using Emma.Core.Github;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -12,17 +15,26 @@ namespace Emma.Core
     {
         public static ExtensionMethod Parse(MethodInfo mi)
         {
+            if(!mi.IsStatic) throw new MethodAccessException($"Method '{mi.Name}' is not an extension method");
             var prms = mi.GetParameters();
 
-            var paramTypes = prms.Length > 1 
-                ? prms[1..].Select(pi => pi.ParameterType).ToArray() 
-                : new Type[] { };
+            if(prms.Length < 1) throw new MethodAccessException($"Method '{mi.Name}' is not an extension method");
 
-            return new ExtensionMethod(mi.Name, 
-                prms[0].ParameterType.Name, 
-                mi.ReturnType.Name, 
-                paramTypes.Select(pt => pt.Name).ToArray());
+            var extendingTypeName = prms[0].ParameterType.Name;
+            var paramTypeNames = prms[1..].Select(pi => pi.ParameterType.Name).ToArray();
+
+            var returnTypeName = mi.ReturnType.Name;
+            if (mi.ReturnType.IsGenericType)
+            {
+                returnTypeName = RationaliseGenericTypename(mi);
+            }
+
+            return new ExtensionMethod(mi.Name,
+                extendingTypeName, 
+                returnTypeName, 
+                paramTypeNames);
         }
+
         public static ExtensionMethod[] Parse(Assembly asm)
         {
             return asm
@@ -30,12 +42,49 @@ namespace Emma.Core
                 .Select(Parse)
                 .ToArray();
         }
+
         public static ExtensionMethod[] Parse(string sourceCode)
         {
             var tree = CSharpSyntaxTree.ParseText(sourceCode);
             var root = tree.GetCompilationUnitRoot();
             var methods = ParseRoot(root.Members);
             return methods;
+        }
+
+        public static ExtensionMethod[] Parse(GithubRepoFolder repo)
+        {
+            return ParseGithubFolder(repo).ToArray();
+        }
+
+        private static IEnumerable<ExtensionMethod> ParseGithubFolder(GithubRepoFolder folder)
+        {
+            var list = new List<ExtensionMethod>();
+
+            foreach (var ghFolder in folder.Folders)
+            {
+                list.AddRange(ParseGithubFolder(ghFolder));
+            }
+
+            list.AddRange(ParseGithubFiles(folder));
+
+            return list;
+        }
+
+        private static IEnumerable<ExtensionMethod> ParseGithubFiles(GithubRepoFolder folder)
+        {
+            var list = new List<ExtensionMethod>();
+
+            foreach (var file in folder.Files)
+            {
+                if (Path.GetExtension(file.Name)
+                    ?.ToLowerInvariant() == ".cs")
+                {
+                    var text = file.Content;
+                    list.AddRange(ExtensionMethodParser.Parse(text));
+                }
+            }
+
+            return list;
         }
 
         private static ExtensionMethod[] ParseRoot(SyntaxList<MemberDeclarationSyntax> members)
@@ -83,33 +132,16 @@ namespace Emma.Core
 
             return ems.ToArray();
         }
-        //
-        // private static ExtensionMethod[] ParseMembers(SyntaxList<SyntaxNode> members)
-        // {
-        //     var result = new SyntaxList<SyntaxNode>();
-        //     foreach (var memberSyntax in members)
-        //     {
-        //         switch (memberSyntax.Kind())
-        //         {
-        //             case SyntaxKind.NamespaceDeclaration:
-        //                 var nextMembers = ((Microsoft.CodeAnalysis.CSharp.Syntax.NamespaceDeclarationSyntax)memberSyntax)
-        //                     .Members;
-        //                 result.AddRange(nextMembers);
-        //                 break;
-        //         }
-        //     }
-        //     return result;
-        // }
-        // private static ExtensionMethod[] ParseSyntax(SyntaxNode syntax)
-        // {
-        //     switch (syntax.Kind())
-        //     {
-        //         case SyntaxKind.NamespaceDeclaration:
-        //             var members = ((Microsoft.CodeAnalysis.CSharp.Syntax.NamespaceDeclarationSyntax)syntax)
-        //                 .Members;
-        //             break;
-        //     }
-        //
-        // }
+
+        private static string RationaliseGenericTypename(MethodInfo mi)
+        {
+            var returnTypeName = mi.ReturnType.Name;
+
+            var genericTypes = mi.ReturnType.GenericTypeArguments.Select(a => a.Name);
+            var genericArgs = string.Join(",", genericTypes);
+            returnTypeName = returnTypeName.Substring(0, returnTypeName.IndexOf("`"));
+            returnTypeName += $"<{genericArgs}>";
+            return returnTypeName;
+        }
     }
 }

@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using System.Linq;
+using Emma.Core.Extensions;
+using Emma.Core.Github;
 using NUnit.Framework;
 
 namespace Emma.Core.Tests
@@ -47,6 +49,25 @@ namespace Emma.Core.Tests
 
             foreach (var mi in ExtensionMethodParser
                 .Parse(csFile))
+            {
+                Console.WriteLine($"{mi}");
+            }
+        }
+
+        [Test, Explicit("Hits the github api, use for debugging/development purposes")]
+        public void Can_parse_github_repo()
+        {
+            var user = "chrislee187";
+            var repo = "Emma";
+
+            var extensionsFromFolderInGit = ExtensionMethodParser
+                .Parse(new GithubRepoFolder(user, repo, Credentials.AppKey(), "src/Emma.Core"));
+
+            var extensionsFromAssembly = ExtensionMethodParser.Parse(typeof(ReflectionExtensions).Assembly);
+
+            CollectionAssert.AreEquivalent(extensionsFromFolderInGit, extensionsFromAssembly);
+
+            foreach (var mi in extensionsFromFolderInGit)
             {
                 Console.WriteLine($"{mi}");
             }
