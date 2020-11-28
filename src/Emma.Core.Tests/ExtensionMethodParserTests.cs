@@ -71,15 +71,15 @@ namespace Emma.Core.Tests
                 .OrderBy(i => i.ToString())
                 .ToArray();
 
-            DumpToConsole(extensionsFromFolderInGit, "From Git");
-            DumpToConsole(extensionsFromAssemblies, "From Assembly");
+            ConsoleDumpMethods(extensionsFromFolderInGit, "From Git");
+            ConsoleDumpMethods(extensionsFromAssemblies, "From Assembly");
 
             CollectionAssert.AreEquivalent(extensionsFromFolderInGit, extensionsFromAssemblies);
 
 
         }
 
-        private static void DumpToConsole(IEnumerable<ExtensionMethod> methods, string source)
+        private static void ConsoleDumpMethods(IEnumerable<ExtensionMethod> methods, string source)
         {
             
             Console.WriteLine();

@@ -7,7 +7,7 @@ namespace Emma.Core.Github
     {
         public string User { get; }
         public string Repo { get; }
-        public new string Path { get; }
+
         private readonly Func<string> _contentProvider;
 
         public GithubFileContent(IGitHubClient github, IGithubLocation loc, RepositoryContent rc) : base(rc.Name, rc.Path, rc.Sha, rc.Size, rc.Type.Value, rc.DownloadUrl,
@@ -16,7 +16,7 @@ namespace Emma.Core.Github
         {
             User = loc.User;
             Repo = loc.Repo;
-            Path = rc.Path;
+            Path = loc.Path ?? rc.Path;
             _contentProvider = () => github.Repository.Content.GetAllContents(User, Repo, Path)
                 .Result[0]
                 .Content;

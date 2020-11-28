@@ -11,13 +11,12 @@ namespace Emma.Core.Tests
         [Test, Explicit("Hits the github api,use for debugging/development purposes")]
         public void Can_read_github_folder()
         {
-            // var repo = new GithubRepoFolder("ChrisLee187", "Emma", Credentials.AppKey());
             var repo = new GithubRepoFolder(Credentials.AppKey(), new GithubLocation("ChrisLee187", "Emma"));
 
             DumpRepo(repo);
         }
 
-        private int _folderDepth = 0;
+        private int _folderDepth;
         private void DumpRepo(GithubRepoFolder repo)
         {
             _folderDepth++;

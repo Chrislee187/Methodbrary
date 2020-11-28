@@ -139,7 +139,7 @@ namespace Emma.Core
 
             var genericTypes = mi.ReturnType.GenericTypeArguments.Select(a => a.Name);
             var genericArgs = string.Join(",", genericTypes);
-            returnTypeName = returnTypeName.Substring(0, returnTypeName.IndexOf("`"));
+            returnTypeName = returnTypeName.Substring(0, returnTypeName.IndexOf("`", StringComparison.Ordinal));
             returnTypeName += $"<{genericArgs}>";
             return returnTypeName;
         }

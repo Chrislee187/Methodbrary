@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Octokit;
 
 namespace Emma.Core.Github
@@ -10,7 +9,6 @@ namespace Emma.Core.Github
     {
         public string User { get; }
         public string Repo { get; }
-        public new string Path { get; }
 
         private readonly List<GithubFileContent> _files = new List<GithubFileContent>();
         private readonly List<GithubRepoFolder> _folders = new List<GithubRepoFolder>();
@@ -38,7 +36,7 @@ namespace Emma.Core.Github
             }
         }
 
-        private bool _folderReadFromGit = false;
+        private bool _folderReadFromGit;
         private readonly IGitHubClient _github;
 
         private GithubRepoFolder(IGitHubClient github, IGithubLocation loc, RepositoryContent rc) : base(rc.Name, rc.Path, rc.Sha, rc.Size, rc.Type.Value, rc.DownloadUrl,
@@ -52,7 +50,7 @@ namespace Emma.Core.Github
             _github = github;
         }
 
-        public GithubRepoFolder(string githubAppKey, GithubLocation location)
+        public GithubRepoFolder(string githubAppKey, IGithubLocation location)
         {
             User = location.User;
             Repo = location.Repo;
@@ -73,7 +71,7 @@ namespace Emma.Core.Github
                 switch (content.Type.Value)
                 {
                     case ContentType.File:
-                        _files.Add(new GithubFileContent(_github, this, content));
+                        _files.Add(new GithubFileContent(_github, new GithubLocation(User, Repo, content.Path), content));
                         break;
                     case ContentType.Dir:
                         _folders.Add(new GithubRepoFolder(_github, this, content));
@@ -110,30 +108,18 @@ namespace Emma.Core.Github
 
         private void SetBaseParams(RepositoryContent content)
         {
-            base.Path = content
-                .Path;
-            base.Name = content
-                .Name;
-            base.Sha = content
-                .Sha;
-            base.Size = content
-                .Size;
-            base.Type = content
-                .Type;
-            base.DownloadUrl = content
-                .DownloadUrl;
-            base.Url = content
-                .Url;
-            base.GitUrl = content
-                .GitUrl;
-            base.HtmlUrl = content
-                .HtmlUrl;
-            base.Encoding = content
-                .Encoding;
-            base.Target = content
-                .Target;
-            base.SubmoduleGitUrl = content
-                .SubmoduleGitUrl;
+            Path = content.Path;
+            Name = content.Name;
+            Sha = content.Sha;
+            Size = content.Size;
+            Type = content.Type;
+            DownloadUrl = content.DownloadUrl;
+            Url = content.Url;
+            GitUrl = content.GitUrl;
+            HtmlUrl = content.HtmlUrl;
+            Encoding = content.Encoding;
+            Target = content.Target;
+            SubmoduleGitUrl = content.SubmoduleGitUrl;
         }
     }
 }
