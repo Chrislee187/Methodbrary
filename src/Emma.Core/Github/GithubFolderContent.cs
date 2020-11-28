@@ -5,13 +5,13 @@ using Octokit;
 namespace Emma.Core.Github
 {
 
-    public class GithubRepoFolder : RepositoryContent, IGithubLocation
+    public class GithubFolderContent : RepositoryContent, IGithubLocation
     {
         public string User { get; }
         public string Repo { get; }
 
         private readonly List<GithubFileContent> _files = new List<GithubFileContent>();
-        private readonly List<GithubRepoFolder> _folders = new List<GithubRepoFolder>();
+        private readonly List<GithubFolderContent> _folders = new List<GithubFolderContent>();
 
         public IEnumerable<GithubFileContent> Files
         {
@@ -23,7 +23,7 @@ namespace Emma.Core.Github
             }
         }
 
-        public IEnumerable<GithubRepoFolder> Folders
+        public IEnumerable<GithubFolderContent> Folders
         {
             get
             {
@@ -39,7 +39,7 @@ namespace Emma.Core.Github
         private bool _folderReadFromGit;
         private readonly IGitHubClient _github;
 
-        private GithubRepoFolder(IGitHubClient github, IGithubLocation loc, RepositoryContent rc) : base(rc.Name, rc.Path, rc.Sha, rc.Size, rc.Type.Value, rc.DownloadUrl,
+        private GithubFolderContent(IGitHubClient github, IGithubLocation loc, RepositoryContent rc) : base(rc.Name, rc.Path, rc.Sha, rc.Size, rc.Type.Value, rc.DownloadUrl,
             rc.Url, rc.GitUrl, rc.HtmlUrl, rc.Encoding,
             rc.EncodedContent, rc.Target, rc.SubmoduleGitUrl)
         {
@@ -50,7 +50,7 @@ namespace Emma.Core.Github
             _github = github;
         }
 
-        public GithubRepoFolder(string githubAppKey, IGithubLocation location)
+        public GithubFolderContent(string githubAppKey, IGithubLocation location)
         {
             User = location.User;
             Repo = location.Repo;
@@ -60,6 +60,14 @@ namespace Emma.Core.Github
             {
                 Connection = { Credentials = new Octokit.Credentials(githubAppKey) }
             };
+        }
+        public GithubFolderContent(GitHubClient github, IGithubLocation location)
+        {
+            User = location.User;
+            Repo = location.Repo;
+            Path = location.Path;
+
+            _github = github;
         }
         private void RequestFolderInfo()
         {
@@ -74,7 +82,7 @@ namespace Emma.Core.Github
                         _files.Add(new GithubFileContent(_github, new GithubLocation(User, Repo, content.Path), content));
                         break;
                     case ContentType.Dir:
-                        _folders.Add(new GithubRepoFolder(_github, this, content));
+                        _folders.Add(new GithubFolderContent(_github, this, content));
                         break;
                     case ContentType.Symlink:
                         break;

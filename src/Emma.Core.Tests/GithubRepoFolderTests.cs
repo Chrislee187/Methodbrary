@@ -7,13 +7,18 @@ using Shouldly;
 namespace Emma.Core.Tests
 {
     [TestFixture, Explicit]
-    public class GithubRepoFolderTests
+    public class GithubRepoFolderTests : GithubTestsBase
     {
 
+        [SetUp]
+        public void SetUp()
+        {
+
+        }
         [Test, Explicit("Hits the github api,use for debugging/development purposes")]
         public void Can_read_github_folder()
         {
-            var repo = new GithubRepoFolder(Credentials.AppKey(), new GithubLocation("ChrisLee187", "Emma"));
+            var repo = new GithubFolderContent(GithubClient, new GithubLocation("ChrisLee187", "Emma"));
             var itemCount = (repo.Folders.Count() + repo.Files.Count());
             itemCount.ShouldBeGreaterThan(0);
 
@@ -21,7 +26,8 @@ namespace Emma.Core.Tests
         }
 
         private int _folderDepth;
-        private void DumpRepo(GithubRepoFolder repo)
+
+        private void DumpRepo(GithubFolderContent repo)
         {
             _folderDepth++;
             foreach (var folder in repo.Folders)

@@ -62,11 +62,12 @@ namespace Emma.Core.Tests
             var repo = "Emma";
             var loc = new GithubLocation(user, repo);
             var extensionsFromFolderInGit = ExtensionMethodParser
-                .Parse(new GithubRepoFolder(Credentials.AppKey(), loc))
+                .Parse(new GithubFolderContent(Credentials.AppKey(), loc))
                 .OrderBy(i => i.ToString())
                 .ToArray();
 
-            var extensionsFromAssemblies = ExtensionMethodParser.Parse(typeof(ReflectionExtensions).Assembly)
+            var extensionsFromAssemblies = 
+                ExtensionMethodParser.Parse(typeof(ReflectionExtensions).Assembly)
                 .Concat(ExtensionMethodParser.Parse(typeof(SampleExtensionsClass).Assembly))
                 .OrderBy(i => i.ToString())
                 .ToArray();

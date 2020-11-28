@@ -6,13 +6,18 @@ namespace Emma.Core
 {
     public class ExtensionMethod
     {
+        public ExtensionMethodSourceType SourceType { get; }
         public readonly string Name;
         public readonly string ExtendingType;
         public readonly string ReturnType;
+        public readonly object Source;
         public readonly string[] ParamTypes;
 
-        public ExtensionMethod(string name, string extendingType, string returnType, string[] paramTypes)
+        public ExtensionMethod(string name, string extendingType, string returnType, string[] paramTypes, 
+            ExtensionMethodSourceType sourceType, object source)
         {
+            Source = source.ToString();
+            SourceType = sourceType;
             Name = name;
             ExtendingType = fixTypes(extendingType);
             ReturnType = fixTypes(returnType);

@@ -32,7 +32,10 @@ namespace Emma.Core
             return new ExtensionMethod(mi.Name,
                 extendingTypeName, 
                 returnTypeName, 
-                paramTypeNames);
+                paramTypeNames,
+                ExtensionMethodSourceType.Assembly,
+                mi.DeclaringType.FullName
+                );
         }
 
         public static ExtensionMethod[] Parse(Assembly asm)
@@ -51,12 +54,12 @@ namespace Emma.Core
             return methods;
         }
 
-        public static ExtensionMethod[] Parse(GithubRepoFolder repo)
+        public static ExtensionMethod[] Parse(GithubFolderContent repo)
         {
             return ParseGithubFolder(repo).ToArray();
         }
 
-        private static IEnumerable<ExtensionMethod> ParseGithubFolder(GithubRepoFolder folder)
+        private static IEnumerable<ExtensionMethod> ParseGithubFolder(GithubFolderContent folder)
         {
             var list = new List<ExtensionMethod>();
 
@@ -70,7 +73,7 @@ namespace Emma.Core
             return list;
         }
 
-        private static IEnumerable<ExtensionMethod> ParseGithubFiles(GithubRepoFolder folder)
+        private static IEnumerable<ExtensionMethod> ParseGithubFiles(GithubFolderContent folder)
         {
             var list = new List<ExtensionMethod>();
 
@@ -121,7 +124,8 @@ namespace Emma.Core
                                 method.Name(),
                                 extendingType,
                                 returnType,
-                                prms
+                                prms,
+                                ExtensionMethodSourceType.SourceCode, method.ToString()
                             );
 
                             ems.Add(em);
@@ -143,5 +147,10 @@ namespace Emma.Core
             returnTypeName += $"<{genericArgs}>";
             return returnTypeName;
         }
+    }
+
+    public enum ExtensionMethodSourceType
+    {
+        Assembly, SourceCode
     }
 }
