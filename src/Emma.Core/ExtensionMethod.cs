@@ -22,11 +22,18 @@ namespace Emma.Core
 
         private string fixTypes(string type)
         {
-            if (type.ToLower() == "boolean") type = "bool";
+            // NOTE: Some hacky code to make types from reflective mechanisms match the strings in source code files
+            // only really used for test comparisons
 
-            if (type == "String") type = "string";
+            if (new[] {"String", "Void", "Single", "Double", "Decimal", "Object", "Char", "Boolean"}.Contains(type))
+            {
+                type = type.ToLowerInvariant();
+            }
+            
+            if (type == "single") type = "float";
+            if (type == "boolean") type = "bool";
 
-            if (type.EndsWith("?")) type = type[..^1];
+            if (type.EndsWith("?")) type = type[..^1]; // NOTE: Ignore nullables for now
 
             return type;
         }

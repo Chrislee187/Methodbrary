@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Emma.Core.Extensions;
@@ -59,15 +60,31 @@ namespace Emma.Core.Tests
         {
             var user = "chrislee187";
             var repo = "Emma";
-
+            var loc = new GithubLocation(user, repo);
             var extensionsFromFolderInGit = ExtensionMethodParser
-                .Parse(new GithubRepoFolder(user, repo, Credentials.AppKey(), "src/Emma.Core"));
+                .Parse(new GithubRepoFolder(Credentials.AppKey(), loc))
+                .OrderBy(i => i.ToString())
+                .ToArray();
 
-            var extensionsFromAssembly = ExtensionMethodParser.Parse(typeof(ReflectionExtensions).Assembly);
+            var extensionsFromAssemblies = ExtensionMethodParser.Parse(typeof(ReflectionExtensions).Assembly)
+                .Concat(ExtensionMethodParser.Parse(typeof(SampleExtensionsClass).Assembly))
+                .OrderBy(i => i.ToString())
+                .ToArray();
 
-            CollectionAssert.AreEquivalent(extensionsFromFolderInGit, extensionsFromAssembly);
+            DumpToConsole(extensionsFromFolderInGit, "From Git");
+            DumpToConsole(extensionsFromAssemblies, "From Assembly");
 
-            foreach (var mi in extensionsFromFolderInGit)
+            CollectionAssert.AreEquivalent(extensionsFromFolderInGit, extensionsFromAssemblies);
+
+
+        }
+
+        private static void DumpToConsole(IEnumerable<ExtensionMethod> methods, string source)
+        {
+            
+            Console.WriteLine();
+            Console.WriteLine(source);
+            foreach (var mi in methods)
             {
                 Console.WriteLine($"{mi}");
             }
