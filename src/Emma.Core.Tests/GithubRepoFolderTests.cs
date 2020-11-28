@@ -1,6 +1,8 @@
 using System;
+using System.Linq;
 using Emma.Core.Github;
 using NUnit.Framework;
+using Shouldly;
 
 namespace Emma.Core.Tests
 {
@@ -12,6 +14,8 @@ namespace Emma.Core.Tests
         public void Can_read_github_folder()
         {
             var repo = new GithubRepoFolder(Credentials.AppKey(), new GithubLocation("ChrisLee187", "Emma"));
+            var itemCount = (repo.Folders.Count() + repo.Files.Count());
+            itemCount.ShouldBeGreaterThan(0);
 
             DumpRepo(repo);
         }
