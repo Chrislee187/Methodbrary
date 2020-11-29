@@ -1,6 +1,6 @@
 using System;
 
-namespace Emma.Core
+namespace Emma.Core.Github
 {
     public class Credentials
     {

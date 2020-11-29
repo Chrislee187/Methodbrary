@@ -1,15 +1,14 @@
 using System.Linq;
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using CSharpExtensions = Microsoft.CodeAnalysis.CSharp.CSharpExtensions;
+
 
 namespace Emma.Core.Extensions
 {
-    public static class RoslynExtensions
+    public static class RoslynCSharpSyntaxExtensions
     {
         public static bool IsStatic(this MemberDeclarationSyntax syntax)
-            => syntax.Modifiers.Any(m => CSharpExtensions.Kind((SyntaxToken) m) == SyntaxKind.StaticKeyword);
+            => syntax.Modifiers.Any(m => m.Kind() == SyntaxKind.StaticKeyword);
 
         public static bool IsPublic(this MemberDeclarationSyntax syntax)
             => syntax.Modifiers.Any(m => m.Kind() == SyntaxKind.PublicKeyword);
@@ -22,8 +21,8 @@ namespace Emma.Core.Extensions
                                  && (syntax.ParameterList.Parameters.Any() 
                                      && syntax.ParameterList.Parameters.First().IsThis());
 
-        public static string Name(this MethodDeclarationSyntax? syntax) => syntax?.Identifier.Text.Trim();
-        public static string Name(this TypeSyntax? syntax) => syntax?.GetText().ToString().Trim();
+        public static string Name(this MethodDeclarationSyntax syntax) => syntax.Identifier.Text.Trim();
+        public static string Name(this TypeSyntax syntax) => syntax.GetText().ToString().Trim();
 
     }
 }

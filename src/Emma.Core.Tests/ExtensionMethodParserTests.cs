@@ -1,10 +1,9 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Emma.Core.Extensions;
 using Emma.Core.Github;
 using NUnit.Framework;
+using Shouldly;
 
 namespace Emma.Core.Tests
 {
@@ -23,13 +22,11 @@ namespace Emma.Core.Tests
 
             var extensionMethodInfos = type
                 .ExtensionMethods()
-                .Select(ExtensionMethodParser.Parse)
+                .Select(m => ExtensionMethodParser.Parse(m, new FileInfo(type.Assembly.Location).LastWriteTimeUtc))
                 .ToList();
 
-            foreach (var mi in extensionMethodInfos)
-            {
-                Console.WriteLine($"{mi}");
-            }
+            ConsoleX.Dump(extensionMethodInfos, 
+                $"From type: {type.FullName}");
         }
 
         [Test]
@@ -37,22 +34,21 @@ namespace Emma.Core.Tests
         {
             var type = typeof(SampleExtensionsClass);
             
-            foreach (var mi in ExtensionMethodParser.Parse(type.Assembly))
-            {
-                Console.WriteLine($"{mi}");
-            }
+            ConsoleX.Dump(ExtensionMethodParser.Parse(type.Assembly), 
+                $"From Assembly: {type.Assembly.Location}");
         }
 
         [Test]
         public void Can_parse_source_code()
         {
-            var csFile = File.ReadAllText(@"..\..\..\SampleExtensionsClass.cs");
+            var path = @"..\..\..\SampleExtensionsClass.cs";
+            var source = File.ReadAllText(path);
+            var fullPath = Path.GetFullPath(path);
+            var updated = new FileInfo(fullPath).LastWriteTimeUtc;
 
-            foreach (var mi in ExtensionMethodParser
-                .Parse(csFile))
-            {
-                Console.WriteLine($"{mi}");
-            }
+            ConsoleX.Dump(ExtensionMethodParser.Parse(source, fullPath, updated)
+            , $"From: {fullPath}");
+
         }
 
         [Test, Explicit("Hits the github api, use for debugging/development purposes")]
@@ -61,8 +57,9 @@ namespace Emma.Core.Tests
             var user = "chrislee187";
             var repo = "Emma";
             var loc = new GithubLocation(user, repo);
+            var gitRoot = new Folder(Credentials.AppKey(), loc);
             var extensionsFromFolderInGit = ExtensionMethodParser
-                .Parse(new GithubFolderContent(Credentials.AppKey(), loc))
+                .Parse(gitRoot)
                 .OrderBy(i => i.ToString())
                 .ToArray();
 
@@ -72,23 +69,14 @@ namespace Emma.Core.Tests
                 .OrderBy(i => i.ToString())
                 .ToArray();
 
-            ConsoleDumpMethods(extensionsFromFolderInGit, "From Git");
-            ConsoleDumpMethods(extensionsFromAssemblies, "From Assembly");
+            ConsoleX.Dump(extensionsFromFolderInGit, $"From Git: {loc.ToUrl()}");
+            ConsoleX.Dump(extensionsFromAssemblies, $"From Assembly {typeof(ReflectionExtensions).Assembly.Location}");
 
-            CollectionAssert.AreEquivalent(extensionsFromFolderInGit, extensionsFromAssemblies);
+            extensionsFromFolderInGit.Length
+                .ShouldBe(extensionsFromAssemblies.Length);
 
 
         }
 
-        private static void ConsoleDumpMethods(IEnumerable<ExtensionMethod> methods, string source)
-        {
-            
-            Console.WriteLine();
-            Console.WriteLine(source);
-            foreach (var mi in methods)
-            {
-                Console.WriteLine($"{mi}");
-            }
-        }
     }
 }

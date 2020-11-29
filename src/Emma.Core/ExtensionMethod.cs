@@ -6,24 +6,35 @@ namespace Emma.Core
 {
     public class ExtensionMethod
     {
+        public string Name { get; }
+        public string ExtendingType { get;  }
+        public string ReturnType { get; }
+        public string[] ParamTypes { get; }
         public ExtensionMethodSourceType SourceType { get; }
-        public readonly string Name;
-        public readonly string ExtendingType;
-        public readonly string ReturnType;
-        public readonly object Source;
-        public readonly string[] ParamTypes;
+        public object Source { get; }
+        public string SourceLocation { get; }
+        public DateTimeOffset LastUpdated { get; }
 
-        public ExtensionMethod(string name, string extendingType, string returnType, string[] paramTypes, 
-            ExtensionMethodSourceType sourceType, object source)
+        // ReSharper disable once UnusedMember.Global -- JSON Serialisation
+        public ExtensionMethod()
         {
-            Source = source.ToString();
-            SourceType = sourceType;
+            
+        }
+        public ExtensionMethod(string name, string extendingType, string returnType, string[] paramTypes,
+            ExtensionMethodSourceType sourceType, object source,
+            DateTimeOffset lastUpdated, string sourceLocation = null)
+        {
             Name = name;
             ExtendingType = fixTypes(extendingType);
             ReturnType = fixTypes(returnType);
             ParamTypes = paramTypes.Select(fixTypes).ToArray();
+            SourceType = sourceType;
+            Source = source;
+            SourceLocation = sourceLocation;
+            LastUpdated = lastUpdated;
 
         }
+
 
         private string fixTypes(string type)
         {
@@ -45,7 +56,8 @@ namespace Emma.Core
         public override string ToString()
         {
             var sb = new StringBuilder();
-            sb.Append($"{ExtendingType}.{Name}(");
+            // sb.Append($"{Path.GetFileName(SourceLocation)}:");
+            sb.Append($"<{ExtendingType}>.{Name}(");
             sb.Append(string.Join(',', ParamTypes));
             sb.Append($") = {ReturnType}");
 

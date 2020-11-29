@@ -1,4 +1,7 @@
 using System;
+// ReSharper disable UnusedMember.Local
+// ReSharper disable UnusedParameter.Global
+// ReSharper disable UnusedParameter.Local
 
 namespace Emma.Core.Tests
 {

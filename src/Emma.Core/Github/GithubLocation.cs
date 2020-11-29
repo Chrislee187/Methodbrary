@@ -19,6 +19,27 @@ namespace Emma.Core.Github
             User = user;
             Repo = repo;
         }
+
+        public string ToUrl()
+        {
+            var url = $@"https:\\github.com\";
+            url = BuildPath(url);
+            return url;
+        }
+
+        private string BuildPath(string url)
+        {
+            url += $"{User}\\{Repo}";
+
+            if (!string.IsNullOrEmpty(Path))
+            {
+                url += $"\\{Path}";
+            }
+
+            return url;
+        }
+
+        public override string ToString() => BuildPath("");
     }
 
     public interface IGithubLocation

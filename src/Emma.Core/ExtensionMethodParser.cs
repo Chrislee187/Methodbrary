@@ -13,7 +13,7 @@ namespace Emma.Core
 {
     public static class ExtensionMethodParser
     {
-        public static ExtensionMethod Parse(MethodInfo mi)
+        public static ExtensionMethod Parse(MethodInfo mi, DateTime lastUpdated)
         {
             if(!mi.IsStatic) throw new MethodAccessException($"Method '{mi.Name}' is not an extension method");
             var prms = mi.GetParameters();
@@ -34,32 +34,36 @@ namespace Emma.Core
                 returnTypeName, 
                 paramTypeNames,
                 ExtensionMethodSourceType.Assembly,
-                mi.DeclaringType.FullName
-                );
+                null,
+                lastUpdated,
+                $"{mi.DeclaringType?.Assembly.Location}:{mi.DeclaringType?.FullName}"
+            );
         }
 
         public static ExtensionMethod[] Parse(Assembly asm)
         {
+            
             return asm
                 .ExtensionMethods()
-                .Select(Parse)
+                .Select(m => Parse(m, new FileInfo(asm.Location).LastWriteTimeUtc))
                 .ToArray();
         }
 
-        public static ExtensionMethod[] Parse(string sourceCode)
+        public static ExtensionMethod[] Parse(string sourceCode, string sourceLocation,
+            DateTimeOffset lastUpdated)
         {
             var tree = CSharpSyntaxTree.ParseText(sourceCode);
             var root = tree.GetCompilationUnitRoot();
-            var methods = ParseRoot(root.Members);
+            var methods = ParseRoot(root.Members, sourceLocation, lastUpdated);
             return methods;
         }
 
-        public static ExtensionMethod[] Parse(GithubFolderContent repo)
+        public static ExtensionMethod[] Parse(Folder repo)
         {
             return ParseGithubFolder(repo).ToArray();
         }
 
-        private static IEnumerable<ExtensionMethod> ParseGithubFolder(GithubFolderContent folder)
+        private static IEnumerable<ExtensionMethod> ParseGithubFolder(Folder folder)
         {
             var list = new List<ExtensionMethod>();
 
@@ -73,7 +77,7 @@ namespace Emma.Core
             return list;
         }
 
-        private static IEnumerable<ExtensionMethod> ParseGithubFiles(GithubFolderContent folder)
+        private static IEnumerable<ExtensionMethod> ParseGithubFiles(Folder folder)
         {
             var list = new List<ExtensionMethod>();
 
@@ -83,14 +87,15 @@ namespace Emma.Core
                     ?.ToLowerInvariant() == ".cs")
                 {
                     var text = file.Content;
-                    list.AddRange(ExtensionMethodParser.Parse(text));
+                    list.AddRange(ExtensionMethodParser.Parse(text, file.Path, file.LastCommitted));
                 }
             }
 
             return list;
         }
 
-        private static ExtensionMethod[] ParseRoot(SyntaxList<MemberDeclarationSyntax> members)
+        private static ExtensionMethod[] ParseRoot(SyntaxList<MemberDeclarationSyntax> members, string sourceLocation,
+            DateTimeOffset lastUpdated)
         {
             var ems = new List<ExtensionMethod>();
             foreach (var memberSyntax in members)
@@ -98,13 +103,13 @@ namespace Emma.Core
                 switch (memberSyntax.Kind())
                 {
                     case SyntaxKind.NamespaceDeclaration:
-                        ems.AddRange(ParseRoot(((NamespaceDeclarationSyntax)memberSyntax).Members));
+                        ems.AddRange(ParseRoot(((NamespaceDeclarationSyntax)memberSyntax).Members, sourceLocation, lastUpdated));
                         break;
                     case SyntaxKind.ClassDeclaration:
                         var classDeclarationSyntax = (ClassDeclarationSyntax)memberSyntax;
                         if (classDeclarationSyntax.IsStatic())
                         {
-                            ems.AddRange(ParseRoot(classDeclarationSyntax.Members));
+                            ems.AddRange(ParseRoot(classDeclarationSyntax.Members, sourceLocation, lastUpdated));
                         }
                         break;
                     case SyntaxKind.MethodDeclaration:
@@ -125,8 +130,9 @@ namespace Emma.Core
                                 extendingType,
                                 returnType,
                                 prms,
-                                ExtensionMethodSourceType.SourceCode, method.ToString()
-                            );
+                                ExtensionMethodSourceType.SourceCode, 
+                                method.ToString(),
+                                lastUpdated, sourceLocation);
 
                             ems.Add(em);
                         }

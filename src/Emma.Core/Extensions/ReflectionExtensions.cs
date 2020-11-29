@@ -16,7 +16,7 @@ namespace Emma.Core.Extensions
 
             return type
                 .GetMethods(BindingFlags.Static | BindingFlags.Public)
-                .Where(mi => CustomAttributeExtensions.IsDefined((MemberInfo) mi, typeof(ExtensionAttribute)))
+                .Where(mi => mi.IsDefined(typeof(ExtensionAttribute)))
                 ;
         }
 

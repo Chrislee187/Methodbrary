@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using Emma.Core.Extensions;
 using NUnit.Framework;
@@ -33,14 +31,6 @@ namespace Emma.Core.Tests
                 .ExtensionMethods()
                 .Count().ShouldBe(5);
 
-        }
-
-        private static void DumpExtensionMethods(List<ExtensionMethod> extensionMethodInfos)
-        {
-            foreach (var mi in extensionMethodInfos)
-            {
-                Console.WriteLine($"{mi}");
-            }
         }
     }
 }

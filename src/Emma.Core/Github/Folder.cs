@@ -1,19 +1,24 @@
 using System;
 using System.Collections.Generic;
+using Emma.Core.Github.Extensions;
 using Octokit;
 
 namespace Emma.Core.Github
 {
-
-    public class GithubFolderContent : RepositoryContent, IGithubLocation
+    public class Folder : IGithubLocation, ICommitInfo
     {
         public string User { get; }
         public string Repo { get; }
+        public string Path { get; }
+        public DateTimeOffset LastCommitted => LastCommit.Committer.Date;
 
-        private readonly List<GithubFileContent> _files = new List<GithubFileContent>();
-        private readonly List<GithubFolderContent> _folders = new List<GithubFolderContent>();
+        private Commit _lastCommit;
 
-        public IEnumerable<GithubFileContent> Files
+        public Commit LastCommit => 
+            _lastCommit ??= _github.Repository.Commit.LastCommit(this);
+
+        private readonly List<FileContent> _files = new List<FileContent>();
+        public IEnumerable<FileContent> Files
         {
             get
             {
@@ -23,7 +28,8 @@ namespace Emma.Core.Github
             }
         }
 
-        public IEnumerable<GithubFolderContent> Folders
+        private readonly List<Folder> _folders = new List<Folder>();
+        public IEnumerable<Folder> Folders
         {
             get
             {
@@ -39,9 +45,7 @@ namespace Emma.Core.Github
         private bool _folderReadFromGit;
         private readonly IGitHubClient _github;
 
-        private GithubFolderContent(IGitHubClient github, IGithubLocation loc, RepositoryContent rc) : base(rc.Name, rc.Path, rc.Sha, rc.Size, rc.Type.Value, rc.DownloadUrl,
-            rc.Url, rc.GitUrl, rc.HtmlUrl, rc.Encoding,
-            rc.EncodedContent, rc.Target, rc.SubmoduleGitUrl)
+        private Folder(IGitHubClient github, IGithubLocation loc, RepositoryContent rc)
         {
             User = loc.User;
             Repo = loc.Repo;
@@ -50,7 +54,7 @@ namespace Emma.Core.Github
             _github = github;
         }
 
-        public GithubFolderContent(string githubAppKey, IGithubLocation location)
+        public Folder(string githubAppKey, IGithubLocation location)
         {
             User = location.User;
             Repo = location.Repo;
@@ -61,7 +65,7 @@ namespace Emma.Core.Github
                 Connection = { Credentials = new Octokit.Credentials(githubAppKey) }
             };
         }
-        public GithubFolderContent(GitHubClient github, IGithubLocation location)
+        public Folder(IGitHubClient github, IGithubLocation location)
         {
             User = location.User;
             Repo = location.Repo;
@@ -72,17 +76,18 @@ namespace Emma.Core.Github
         private void RequestFolderInfo()
         {
             var repoContent = _github.Repository.Content;
+            
             var contents = GetFolderContents(repoContent);
-
+            
             foreach (var content in contents)
             {
                 switch (content.Type.Value)
                 {
                     case ContentType.File:
-                        _files.Add(new GithubFileContent(_github, new GithubLocation(User, Repo, content.Path), content));
+                        _files.Add(new FileContent(_github, new GithubLocation(User, Repo, content.Path), content));
                         break;
                     case ContentType.Dir:
-                        _folders.Add(new GithubFolderContent(_github, this, content));
+                        _folders.Add(new Folder(_github, this, content));
                         break;
                     case ContentType.Symlink:
                         break;
@@ -103,7 +108,7 @@ namespace Emma.Core.Github
             {
                 contents = repoContent.GetAllContents(User, Repo)
                     .Result;
-                SetBaseParams(contents[0]);
+                // SetBaseParams(contents[0]);
             }
             else
             {
@@ -112,22 +117,6 @@ namespace Emma.Core.Github
             }
 
             return contents;
-        }
-
-        private void SetBaseParams(RepositoryContent content)
-        {
-            Path = content.Path;
-            Name = content.Name;
-            Sha = content.Sha;
-            Size = content.Size;
-            Type = content.Type;
-            DownloadUrl = content.DownloadUrl;
-            Url = content.Url;
-            GitUrl = content.GitUrl;
-            HtmlUrl = content.HtmlUrl;
-            Encoding = content.Encoding;
-            Target = content.Target;
-            SubmoduleGitUrl = content.SubmoduleGitUrl;
         }
     }
 }
