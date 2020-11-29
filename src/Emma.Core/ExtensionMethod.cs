@@ -6,6 +6,7 @@ namespace Emma.Core
 {
     public class ExtensionMethod
     {
+        // ReSharper disable UnusedAutoPropertyAccessor.Global
         // ReSharper disable AutoPropertyCanBeMadeGetOnly.Global -- Serialization
         public string Name { get; set;  }
         public string ExtendingType { get; set; }
@@ -16,12 +17,14 @@ namespace Emma.Core
         public string SourceLocation { get; set; }
         public DateTimeOffset LastUpdated { get; set; }
         // ReSharper restore AutoPropertyCanBeMadeGetOnly.Global
+        // ReSharper restore UnusedAutoPropertyAccessor.Global
 
         // ReSharper disable once UnusedMember.Global -- JSON Serialisation
         public ExtensionMethod()
         {
             
         }
+
         public ExtensionMethod(string name, string extendingType, string returnType, string[] paramTypes,
             ExtensionMethodSourceType sourceType, object source,
             DateTimeOffset lastUpdated, string sourceLocation = null)
@@ -34,14 +37,12 @@ namespace Emma.Core
             Source = source;
             SourceLocation = sourceLocation;
             LastUpdated = lastUpdated;
-
         }
-
 
         private string fixTypes(string type)
         {
             // NOTE: Some hacky code to make types from reflective mechanisms match the strings in source code files
-            // only really used for test comparisons
+            // only really used for the test comparisons
 
             if (new[] {"String", "Void", "Single", "Double", "Decimal", "Object", "Char", "Boolean"}.Contains(type))
             {
@@ -66,10 +67,7 @@ namespace Emma.Core
             return sb.ToString();
         }
 
-        protected bool Equals(ExtensionMethod other)
-        {
-            return ToString() == other.ToString();
-        }
+        protected bool Equals(ExtensionMethod other) => ToString() == other.ToString();
 
         public override bool Equals(object obj)
         {
@@ -79,9 +77,6 @@ namespace Emma.Core
             return Equals((ExtensionMethod) obj);
         }
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Name, ExtendingType, ReturnType, ParamTypes);
-        }
+        public override int GetHashCode() => ToString().GetHashCode();
     }
 }

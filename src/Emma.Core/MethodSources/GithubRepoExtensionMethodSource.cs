@@ -33,6 +33,7 @@ namespace Emma.Core.MethodSources
                 if (repo.LastCommitted > m.LastUpdated)
                 {
                     GetExtensionMethodsFromGithub();
+                    _cache.Add(cacheId, this);
                 }
 
                 Methods = m.Methods;
