@@ -1,4 +1,4 @@
-namespace Emma.Core.Tests
+namespace Emma.Core.Tests.Support
 {
     public class NonStaticSampleClass
     {

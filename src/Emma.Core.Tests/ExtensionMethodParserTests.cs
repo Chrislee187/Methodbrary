@@ -2,6 +2,7 @@ using System.IO;
 using System.Linq;
 using Emma.Core.Extensions;
 using Emma.Core.Github;
+using Emma.Core.Tests.Support;
 using NUnit.Framework;
 using Shouldly;
 

@@ -1,9 +1,10 @@
 using System.Linq;
 using Emma.Core.Github;
+using Emma.Core.Tests.Support;
 using NUnit.Framework;
 using Shouldly;
 
-namespace Emma.Core.Tests
+namespace Emma.Core.Tests.Github
 {
     [TestFixture, Explicit]
     public class GithubRepoFolderTests : GithubTestsBase

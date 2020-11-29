@@ -1,9 +1,10 @@
 using System;
+
 // ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedParameter.Global
 // ReSharper disable UnusedParameter.Local
 
-namespace Emma.Core.Tests
+namespace Emma.Core.Tests.Support
 {
     public static class SampleExtensionsClass
     {

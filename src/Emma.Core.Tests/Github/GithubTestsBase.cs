@@ -1,6 +1,6 @@
 using Octokit;
 
-namespace Emma.Core.Tests
+namespace Emma.Core.Tests.Github
 {
     public class GithubTestsBase
     {
@@ -9,7 +9,7 @@ namespace Emma.Core.Tests
         {
             GithubClient = new GitHubClient(new ProductHeaderValue("EmmaTests"))
             {
-                Connection = { Credentials = new Octokit.Credentials(Credentials.AppKey()) }
+                Connection = { Credentials = new Credentials( Emma.Core.Github.Credentials.AppKey()) }
             };
         }
     }

@@ -1,6 +1,7 @@
 using Emma.Core.Cache;
 using Emma.Core.Github;
 using Emma.Core.MethodSources;
+using Emma.Core.Tests.Github;
 using NUnit.Framework;
 
 namespace Emma.Core.Tests

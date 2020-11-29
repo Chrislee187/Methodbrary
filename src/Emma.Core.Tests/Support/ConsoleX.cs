@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Emma.Core.Github;
 
-namespace Emma.Core.Tests
+namespace Emma.Core.Tests.Support
 {
     public static class ConsoleX
     {
