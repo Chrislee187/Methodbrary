@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 // ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedParameter.Global
@@ -16,15 +18,16 @@ namespace Emma.Core.Tests.Support
         {
 
         }
-        public static void ToNowhere(this object obj, string a, float b, Type c)
+        public static void ToNowhere(this object obj, string a, float b, IEnumerable<int> c)
         {
 
         }
-        private static void ToNowherePrivate(this object obj, string a, float b, Type c)
+
+        private static void ToNowherePrivate(this object obj, string a, float b, IEnumerable<int> c)
         {
 
         }
-         
+
         public static void NotAnExtensionMethod()
         {
 
@@ -38,6 +41,22 @@ namespace Emma.Core.Tests.Support
 
         }
         public static void ToNowhere(this object obj, string a, float b, Type c)
+        {
+
+        }
+        public static void ToNowhere(this object obj, string a, int b, Type c)
+        {
+
+        }
+        public static void ToNowhere(this object obj, string a, long b, Type c)
+        {
+
+        }
+        public static void ToNowhere(this object obj, string a, byte b, Type c)
+        {
+
+        }
+        public static void ToNowhere(this object obj, string a, char b, Type c)
         {
 
         }

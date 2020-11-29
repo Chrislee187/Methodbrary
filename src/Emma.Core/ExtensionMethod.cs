@@ -38,9 +38,9 @@ namespace Emma.Core
             DateTimeOffset lastUpdated, string sourceLocation, string className)
         {
             Name = name;
-            ExtendingType = NormaliseType(extendingType);
-            ReturnType = NormaliseType(returnType);
-            ParamTypes = paramTypes.Select(NormaliseType).ToArray();
+            ExtendingType = NormaliseDotNetType(extendingType);
+            ReturnType = NormaliseDotNetType(returnType);
+            ParamTypes = paramTypes.Select(NormaliseDotNetType).ToArray();
             SourceType = sourceType;
             Source = source;
             SourceLocation = sourceLocation;
@@ -48,23 +48,28 @@ namespace Emma.Core
             ClassName = className;
         }
 
-        protected string NormaliseType(string type)
+        protected string NormaliseDotNetType(string type)
         {
             // NOTE: Some hacky code to make types from reflective mechanisms match the strings in source code files
             // only really used for the test comparisons
 
-            if (new[] {"String", "Void", "Single", "Double", "Decimal", "Object", "Char", "Boolean"}.Contains(type))
+            if (new[] {"Byte", "String", "Void", "Single", "Double", "Decimal", "Object", "Char", "Boolean"}.Contains(type))
             {
                 type = type.ToLowerInvariant();
             }
             
             if (type == "single") type = "float";
             if (type == "boolean") type = "bool";
+            if (type == "Int32") type = "int";
+            if (type == "Int64") type = "long";
 
             if (type.EndsWith("?")) type = type[..^1]; // NOTE: Ignore nullables for now
 
             return type;
         }
+
+        #region ToString()
+
         public override string ToString()
         {
             var sb = new StringBuilder();
@@ -76,9 +81,12 @@ namespace Emma.Core
                 sb.Append(string.Join(", ", ParamTypes));
             }
             sb.Append($") = {ReturnType}");
-
+            
             return sb.ToString();
         }
+
+        #endregion 
+        #region Equality
 
         protected bool Equals(ExtensionMethod other) => ToString() == other.ToString();
 
@@ -87,9 +95,11 @@ namespace Emma.Core
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((ExtensionMethod) obj);
+            return Equals((ExtensionMethod)obj);
         }
 
-        public override int GetHashCode() => ToString().GetHashCode();
+        public override int GetHashCode() => ToString().GetHashCode(); 
+
+        #endregion
     }
 }

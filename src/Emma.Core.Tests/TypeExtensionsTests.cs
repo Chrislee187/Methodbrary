@@ -30,7 +30,7 @@ namespace Emma.Core.Tests
             typeof(SampleExtensionsClass)
                 .Assembly
                 .ExtensionMethods()
-                .Count().ShouldBe(5);
+                .Count().ShouldBe(9);
 
         }
     }
