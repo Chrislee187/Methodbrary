@@ -8,7 +8,7 @@ namespace Emma.Core.Tests.Support
 {
     public static class SampleExtensionsClass
     {
-        public static string ToString(this object obj)
+        public static string ToAString(this object obj)
         {
             return string.Empty;
         }

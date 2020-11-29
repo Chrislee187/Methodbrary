@@ -17,7 +17,7 @@ namespace Emma.Core.Tests
         }
 
         [Test]
-        public void Can_parse_Type()
+        public void Can_parse_MethodInfo()
         {
             var type = typeof(SampleExtensionsClass);
 
@@ -42,7 +42,7 @@ namespace Emma.Core.Tests
         [Test]
         public void Can_parse_source_code()
         {
-            var path = @"..\..\..\SampleExtensionsClass.cs";
+            var path = @"..\..\..\Support\SampleExtensionsClass.cs";
             var source = File.ReadAllText(path);
             var fullPath = Path.GetFullPath(path);
             var updated = new FileInfo(fullPath).LastWriteTimeUtc;

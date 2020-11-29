@@ -26,10 +26,13 @@ namespace Emma.Core.Tests.Support
             _folderDepth--;
         }
 
-        public static void Dump(IEnumerable<ExtensionMethod> methods, string source)
+        public static void Dump(IEnumerable<ExtensionMethod> methods, string source = null)
         {
             Console.WriteLine();
-            Console.WriteLine(source);
+            if (!string.IsNullOrEmpty(source))
+            {
+                Console.WriteLine(source);
+            }
             foreach (var mi in methods)
             {
                 Dump(mi);

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Emma.Core.MethodSources
 {
@@ -6,6 +7,6 @@ namespace Emma.Core.MethodSources
     {
         
         public DateTimeOffset LastUpdated { get; set; }
-        public ExtensionMethod[] Methods { get; set; }
+        public IEnumerable<ExtensionMethod> Methods { get; set; }
     }
 }
