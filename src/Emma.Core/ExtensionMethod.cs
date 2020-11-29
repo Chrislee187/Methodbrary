@@ -7,32 +7,16 @@ namespace Emma.Core
 {
     public class ExtensionMethod
     {
-        private string _returnType;
-        private string _extendingType;
-        private string[] _paramTypes;
-
         // ReSharper disable UnusedAutoPropertyAccessor.Global
         // ReSharper disable AutoPropertyCanBeMadeGetOnly.Global -- Serialization
         public string Name { get; set;  }
 
-        public string ExtendingType
-        {
-            get => _extendingType;
-            protected set => _extendingType = fixTypes(value);
-        }
+        public string ExtendingType { get; set; }
 
 
-        public string ReturnType
-        {
-            get => _returnType;
-            protected set => _returnType = fixTypes(value);
-        }
+        public string ReturnType { get; set; }
 
-        public string[] ParamTypes
-        {
-            get => _paramTypes;
-            protected set => _paramTypes = value.Select(fixTypes).ToArray();
-        }
+        public string[] ParamTypes { get; set; }
 
         public ExtensionMethodSourceType SourceType { get; set; }
         public object Source { get; set; }
@@ -41,8 +25,9 @@ namespace Emma.Core
         public string ClassName { get; set; }
         // ReSharper restore AutoPropertyCanBeMadeGetOnly.Global
         // ReSharper restore UnusedAutoPropertyAccessor.Global
-
+        
         // ReSharper disable once UnusedMember.Global -- JSON Serialisation
+        // ReSharper disable once MemberCanBeProtected.Global -- JSON Serialisation
         public ExtensionMethod()
         {
             
@@ -53,9 +38,9 @@ namespace Emma.Core
             DateTimeOffset lastUpdated, string sourceLocation, string className)
         {
             Name = name;
-            ExtendingType = fixTypes(extendingType);
-            ReturnType = fixTypes(returnType);
-            ParamTypes = paramTypes.Select(fixTypes).ToArray();
+            ExtendingType = NormaliseType(extendingType);
+            ReturnType = NormaliseType(returnType);
+            ParamTypes = paramTypes.Select(NormaliseType).ToArray();
             SourceType = sourceType;
             Source = source;
             SourceLocation = sourceLocation;
@@ -63,8 +48,7 @@ namespace Emma.Core
             ClassName = className;
         }
 
-        
-        private string fixTypes(string type)
+        protected string NormaliseType(string type)
         {
             // NOTE: Some hacky code to make types from reflective mechanisms match the strings in source code files
             // only really used for the test comparisons

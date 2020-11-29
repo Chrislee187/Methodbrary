@@ -44,6 +44,9 @@ namespace Emma.Core
             || QueryMatchers.String(ReturnType, compare, Insensitive, ReturnTypeMatchMode);
 
         private bool ParamTypesMatch(string[] compare) => 
-            ParamTypes == null || !ParamTypes.Any() || ParamTypes.All(compare.Contains);
+            ParamTypes == null 
+            || !ParamTypes.Any() 
+            || ParamTypes.All(pt => compare.Any(c => 
+                QueryMatchers.String(pt, c, Insensitive, ParamTypesMatchMode)));
     }
 }

@@ -129,9 +129,9 @@ namespace Emma.Core
             }
 
             Name = mi.Name;
-            ExtendingType = extendingTypeName;
-            ReturnType = returnTypeName;
-            ParamTypes = paramTypeNames;
+            ExtendingType = NormaliseType(extendingTypeName);
+            ReturnType = NormaliseType(returnTypeName);
+            ParamTypes = paramTypeNames.Select(NormaliseType).ToArray();
             SourceType = ExtensionMethodSourceType.Assembly;
             Source = null;
             LastUpdated = lastUpdated;
@@ -158,7 +158,7 @@ namespace Emma.Core
             if (!member.IsExtensionMethod())
             {
                 throw new ArgumentException($"member '{member.Name()}' is not an extension method.");
-            };
+            }
 
 
             var extendingType = member.ParameterList.Parameters.First()
@@ -171,9 +171,9 @@ namespace Emma.Core
                 .ToArray();
 
             Name = member.Name();
-            ExtendingType = extendingType;
-            ReturnType = returnType;
-            ParamTypes = prms;
+            ExtendingType = NormaliseType(extendingType);
+            ReturnType = NormaliseType(returnType);
+            ParamTypes = prms.Select(NormaliseType).ToArray();
             SourceType = ExtensionMethodSourceType.Assembly;
             Source = null;
             LastUpdated = lastUpdated;
