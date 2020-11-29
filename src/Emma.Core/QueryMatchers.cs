@@ -24,7 +24,7 @@ namespace Emma.Core
                 _ => throw new ArgumentOutOfRangeException()
             };
 
-            return matcher(text, compare);
+            return matcher(left, right);
         }
     }
 }

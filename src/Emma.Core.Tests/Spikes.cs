@@ -1,12 +1,8 @@
-using System;
-using System.Linq;
 using Emma.Core.Cache;
 using Emma.Core.Github;
 using Emma.Core.MethodSources;
 using Emma.Core.Tests.Github;
-using Emma.Core.Tests.Support;
 using NUnit.Framework;
-using Shouldly;
 
 namespace Emma.Core.Tests
 {

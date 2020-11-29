@@ -8,99 +8,27 @@ using Emma.Core.Github;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Emit;
-using Octokit;
 
 namespace Emma.Core
 {
     public static class ExtensionMethodParser
     {
-        public static IEnumerable<ExtensionMethod> Parse(IEnumerable<MethodInfo> mis, DateTime lastUpdated)
-        {
-            return mis.Select(m => ExtensionMethodParser.Parse(m, lastUpdated));
-        }
+        public static ExtensionMethod Parse(MethodInfo mi, DateTime lastUpdated) => 
+            new MethodInfoExtensionMethod(mi, lastUpdated);
 
-        public class MethodInfoExtensionMethod : ExtensionMethod
-        {
-            public MethodInfoExtensionMethod(MethodInfo mi, DateTime lastUpdated)
-            {
-                if (!mi.IsStatic) throw new MethodAccessException($"Method '{mi.Name}' is not an extension method");
-                var prms = mi.GetParameters();
+        public static IEnumerable<ExtensionMethod> Parse(IEnumerable<MethodInfo> mis, DateTime lastUpdated) => 
+            mis.Select(m => ExtensionMethodParser.Parse(m, lastUpdated));
 
-                if (prms.Length < 1) throw new MethodAccessException($"Method '{mi.Name}' is not an extension method");
+        public static ExtensionMethod[] Parse(Assembly asm) => 
+            asm.ExtensionMethods()
+            .Select(m => Parse(m, new FileInfo(asm.Location).LastWriteTimeUtc))
+            .ToArray();
 
-                var extendingTypeName = prms[0]
-                    .ParameterType.Name;
-                var paramTypeNames = prms[1..]
-                    .Select(pi => pi.ParameterType.Name)
-                    .ToArray();
-
-                var returnTypeName = mi.ReturnType.Name;
-                if (mi.ReturnType.IsGenericType)
-                {
-                    returnTypeName = RationaliseGenericTypename(mi);
-                }
-
-                Name = mi.Name;
-                ExtendingType = extendingTypeName;
-                ReturnType = returnTypeName;
-                ParamTypes = paramTypeNames;
-                SourceType = ExtensionMethodSourceType.Assembly;
-                Source = null;
-                LastUpdated = lastUpdated;
-                SourceLocation = $"{mi.DeclaringType?.Assembly.Location}:{mi.DeclaringType?.FullName}";
-                ClassName = mi.DeclaringType.Name;
-            }
-        }
-        public static ExtensionMethod Parse(MethodInfo mi, DateTime lastUpdated)
-        {
-            return new MethodInfoExtensionMethod(mi, lastUpdated);
-            // if (!mi.IsStatic) throw new MethodAccessException($"Method '{mi.Name}' is not an extension method");
-            // var prms = mi.GetParameters();
-            //
-            // if (prms.Length < 1) throw new MethodAccessException($"Method '{mi.Name}' is not an extension method");
-            //
-            // var extendingTypeName = prms[0]
-            //     .ParameterType.Name;
-            // var paramTypeNames = prms[1..]
-            //     .Select(pi => pi.ParameterType.Name)
-            //     .ToArray();
-            //
-            // var returnTypeName = mi.ReturnType.Name;
-            // if (mi.ReturnType.IsGenericType)
-            // {
-            //     returnTypeName = RationaliseGenericTypename(mi);
-            // }
-            //
-            // return new ExtensionMethod(mi.Name,
-            //     extendingTypeName,
-            //     returnTypeName,
-            //     paramTypeNames,
-            //     ExtensionMethodSourceType.Assembly,
-            //     null,
-            //     lastUpdated,
-            //     $"{mi.DeclaringType?.Assembly.Location}:{mi.DeclaringType?.FullName}",
-            //     mi.DeclaringType.Name
-            // );
-        }
-
-        public static ExtensionMethod[] Parse(Assembly asm)
-        {
-
-            return asm
-                .ExtensionMethods()
-                .Select(m => Parse(m, new FileInfo(asm.Location).LastWriteTimeUtc))
-                .ToArray();
-        }
-
-        public static ExtensionMethod[] Parse(string sourceCode, string sourceLocation,
-            DateTimeOffset lastUpdated)
-        {
-            var tree = CSharpSyntaxTree.ParseText(sourceCode);
-            var root = tree.GetCompilationUnitRoot();
-            var methods = ParseRoot(root.Members, sourceLocation, lastUpdated);
-            return methods;
-        }
+        public static ExtensionMethod[] Parse(string sourceCode, string sourceLocation, DateTimeOffset lastUpdated) => 
+            ParseSyntax(
+                CSharpSyntaxTree.ParseText(sourceCode).GetCompilationUnitRoot().Members, 
+                sourceLocation, 
+                lastUpdated);
 
         public static ExtensionMethod[] Parse(Folder repo)
         {
@@ -141,7 +69,7 @@ namespace Emma.Core
 
         private static string _lastClassName = "";
 
-        private static ExtensionMethod[] ParseRoot(SyntaxList<MemberDeclarationSyntax> members, string sourceLocation,
+        private static ExtensionMethod[] ParseSyntax(SyntaxList<MemberDeclarationSyntax> members, string sourceLocation,
             DateTimeOffset lastUpdated)
         {
             var ems = new List<ExtensionMethod>();
@@ -150,7 +78,7 @@ namespace Emma.Core
                 switch (memberSyntax.Kind())
                 {
                     case SyntaxKind.NamespaceDeclaration:
-                        ems.AddRange(ParseRoot(((NamespaceDeclarationSyntax) memberSyntax).Members, sourceLocation,
+                        ems.AddRange(ParseSyntax(((NamespaceDeclarationSyntax) memberSyntax).Members, sourceLocation,
                             lastUpdated));
                         break;
                     case SyntaxKind.ClassDeclaration:
@@ -158,7 +86,7 @@ namespace Emma.Core
                         _lastClassName = classDeclarationSyntax.Identifier.Text;
                         if (classDeclarationSyntax.IsStatic())
                         {
-                            ems.AddRange(ParseRoot(classDeclarationSyntax.Members, sourceLocation, lastUpdated));
+                            ems.AddRange(ParseSyntax(classDeclarationSyntax.Members, sourceLocation, lastUpdated));
                         }
 
                         break;
@@ -167,25 +95,7 @@ namespace Emma.Core
 
                         if (method.IsExtensionMethod())
                         {
-                            var extendingType = method.ParameterList.Parameters.First()
-                                .Type.Name();
-                            var returnType = method.ReturnType.Name();
-
-                            var prms = method.ParameterList.Parameters
-                                .Skip(1)
-                                .Select(p => p.Type?.Name())
-                                .ToArray();
-
-                            var em = new ExtensionMethod(
-                                method.Name(),
-                                extendingType,
-                                returnType,
-                                prms,
-                                ExtensionMethodSourceType.SourceCode,
-                                method.ToString(),
-                                lastUpdated, sourceLocation, _lastClassName);
-
-                            ems.Add(em);
+                            ems.Add(new MemberSyntaxExtensionMethod(method, lastUpdated, _lastClassName, sourceLocation));
                         }
 
                         break;
@@ -195,7 +105,41 @@ namespace Emma.Core
             return ems.ToArray();
         }
 
-        private static string RationaliseGenericTypename(MethodInfo mi)
+    }
+
+    internal class MethodInfoExtensionMethod : ExtensionMethod
+    {
+        public MethodInfoExtensionMethod(MethodInfo mi, DateTime lastUpdated)
+        {
+            if (!mi.IsStatic) throw new MethodAccessException($"Method '{mi.Name}' is not an extension method");
+            var prms = mi.GetParameters();
+
+            if (prms.Length < 1) throw new MethodAccessException($"Method '{mi.Name}' is not an extension method");
+
+            var extendingTypeName = prms[0]
+                .ParameterType.Name;
+            var paramTypeNames = prms[1..]
+                .Select(pi => pi.ParameterType.Name)
+                .ToArray();
+
+            var returnTypeName = mi.ReturnType.Name;
+            if (mi.ReturnType.IsGenericType)
+            {
+                returnTypeName = RationaliseGenericTypename(mi);
+            }
+
+            Name = mi.Name;
+            ExtendingType = extendingTypeName;
+            ReturnType = returnTypeName;
+            ParamTypes = paramTypeNames;
+            SourceType = ExtensionMethodSourceType.Assembly;
+            Source = null;
+            LastUpdated = lastUpdated;
+            SourceLocation = $"{mi.DeclaringType?.Assembly.Location}:{mi.DeclaringType?.FullName}";
+            ClassName = mi.DeclaringType?.Name;
+        }
+
+        private string RationaliseGenericTypename(MethodInfo mi)
         {
             var returnTypeName = mi.ReturnType.Name;
 
@@ -204,6 +148,38 @@ namespace Emma.Core
             returnTypeName = returnTypeName.Substring(0, returnTypeName.IndexOf("`", StringComparison.Ordinal));
             returnTypeName += $"<{genericArgs}>";
             return returnTypeName;
+        }
+    }
+
+    internal class MemberSyntaxExtensionMethod : ExtensionMethod
+    {
+        public MemberSyntaxExtensionMethod(MethodDeclarationSyntax member, DateTimeOffset lastUpdated, string className, string sourceLocation)
+        {
+            if (!member.IsExtensionMethod())
+            {
+                throw new ArgumentException($"member '{member.Name()}' is not an extension method.");
+            };
+
+
+            var extendingType = member.ParameterList.Parameters.First()
+                .Type.Name();
+            var returnType = member.ReturnType.Name();
+
+            var prms = member.ParameterList.Parameters
+                .Skip(1)
+                .Select(p => p.Type?.Name())
+                .ToArray();
+
+            Name = member.Name();
+            ExtendingType = extendingType;
+            ReturnType = returnType;
+            ParamTypes = prms;
+            SourceType = ExtensionMethodSourceType.Assembly;
+            Source = null;
+            LastUpdated = lastUpdated;
+            SourceLocation = sourceLocation;
+            ClassName = className;
+
         }
     }
 
