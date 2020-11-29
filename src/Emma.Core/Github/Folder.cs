@@ -10,12 +10,11 @@ namespace Emma.Core.Github
         public string User { get; }
         public string Repo { get; }
         public string Path { get; }
-        public DateTimeOffset LastCommitted => LastCommit.Committer.Date;
 
         private Commit _lastCommit;
-
         public Commit LastCommit => 
             _lastCommit ??= _github.Repository.Commit.LastCommit(this);
+        public DateTimeOffset LastCommitted => LastCommit.Committer.Date;
 
         private readonly List<FileContent> _files = new List<FileContent>();
         public IEnumerable<FileContent> Files
@@ -73,6 +72,7 @@ namespace Emma.Core.Github
 
             _github = github;
         }
+        
         private void RequestFolderInfo()
         {
             var repoContent = _github.Repository.Content;

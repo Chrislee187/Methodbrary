@@ -32,8 +32,12 @@ namespace Emma.Core.Tests.Support
             Console.WriteLine(source);
             foreach (var mi in methods)
             {
-                Console.WriteLine($"{mi}");
+                Dump(mi);
             }
+        }
+        public static void Dump(ExtensionMethod method)
+        {
+        Console.WriteLine($"{method}");
         }
     }
 }

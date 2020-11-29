@@ -6,18 +6,17 @@ namespace Emma.Core.Github
 {
     public class FileContent : RepositoryContent, IGithubLocation, ICommitInfo
     {
-        private string _content;
         private readonly IGitHubClient _github;
 
         public string User { get; }
         public string Repo { get; }
 
         private readonly Func<RepositoryContent> _contentProvider;
-
+        private string _content;
         public new string Content => _content ??= _contentProvider().Content ?? "";
+        
         public DateTimeOffset LastCommitted => LastCommit.Committer.Date;
         private Commit _lastCommit;
-
         public Commit LastCommit =>
             _lastCommit ??= _github.Repository.Commit.LastCommit(this);
 

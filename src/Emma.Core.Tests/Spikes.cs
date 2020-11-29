@@ -2,6 +2,7 @@ using Emma.Core.Cache;
 using Emma.Core.Github;
 using Emma.Core.MethodSources;
 using Emma.Core.Tests.Github;
+using Emma.Core.Tests.Support;
 using NUnit.Framework;
 
 namespace Emma.Core.Tests
@@ -22,6 +23,11 @@ namespace Emma.Core.Tests
                 new GithubLocation("chrislee187", "UsefulStuff", "UsefullStuff"), 
                 new AppDataExtensionMethodJsonCache(),
                 "github.emma.spike" );
+
+            foreach (var m in emSource.Methods)
+            {
+                ConsoleX.Dump(m);
+            }
         }
     }
 }

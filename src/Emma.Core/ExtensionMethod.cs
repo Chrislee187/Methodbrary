@@ -6,14 +6,16 @@ namespace Emma.Core
 {
     public class ExtensionMethod
     {
-        public string Name { get; }
-        public string ExtendingType { get;  }
-        public string ReturnType { get; }
-        public string[] ParamTypes { get; }
-        public ExtensionMethodSourceType SourceType { get; }
-        public object Source { get; }
-        public string SourceLocation { get; }
-        public DateTimeOffset LastUpdated { get; }
+        // ReSharper disable AutoPropertyCanBeMadeGetOnly.Global -- Serialization
+        public string Name { get; set;  }
+        public string ExtendingType { get; set; }
+        public string ReturnType { get; set; }
+        public string[] ParamTypes { get; set; }
+        public ExtensionMethodSourceType SourceType { get; set; }
+        public object Source { get; set; }
+        public string SourceLocation { get; set; }
+        public DateTimeOffset LastUpdated { get; set; }
+        // ReSharper restore AutoPropertyCanBeMadeGetOnly.Global
 
         // ReSharper disable once UnusedMember.Global -- JSON Serialisation
         public ExtensionMethod()
