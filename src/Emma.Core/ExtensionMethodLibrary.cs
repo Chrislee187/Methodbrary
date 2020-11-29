@@ -17,7 +17,7 @@ namespace Emma.Core
             _sources.SelectMany(s => s.Methods)
                 .OrderBy(s => s.ToString());
 
-        public IEnumerable<ExtensionMethod> FindByName(string name, StringMatchMode matchMode = StringMatchMode.Equals) => 
+        public IEnumerable<ExtensionMethod> FindByName(string name, StringMatchMode matchMode = StringMatchMode.Contains) => 
             Find(new ExtensionMethodQuery { NameMatchMode = matchMode, Name = name });
         public IEnumerable<ExtensionMethod> FindByExtendingType(string type, StringMatchMode matchMode = StringMatchMode.Equals) =>
             Find(new ExtensionMethodQuery { ExtendingTypeMatchMode = matchMode, ExtendingType = type });

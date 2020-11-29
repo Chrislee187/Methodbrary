@@ -24,10 +24,10 @@ namespace Emma.Core.Extensions
         {
             var infos = new List<MethodInfo>();
 
-            foreach (var staticTypes in assembly.GetExportedTypes()
+            foreach (var staticType in assembly.GetExportedTypes()
                 .Where(t => t.IsStatic()))
             {
-                infos.AddRange(staticTypes.ExtensionMethods());
+                infos.AddRange(staticType.ExtensionMethods());
             }
 
             return infos;

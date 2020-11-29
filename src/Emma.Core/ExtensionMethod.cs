@@ -9,6 +9,7 @@ namespace Emma.Core
     {
         // ReSharper disable UnusedAutoPropertyAccessor.Global
         // ReSharper disable AutoPropertyCanBeMadeGetOnly.Global -- Serialization
+        // ReSharper disable MemberCanBeProtected.Global -- JSON Serialisation
         public string Name { get; set;  }
 
         public string ExtendingType { get; set; }
@@ -25,9 +26,8 @@ namespace Emma.Core
         public string ClassName { get; set; }
         // ReSharper restore AutoPropertyCanBeMadeGetOnly.Global
         // ReSharper restore UnusedAutoPropertyAccessor.Global
-        
+
         // ReSharper disable once UnusedMember.Global -- JSON Serialisation
-        // ReSharper disable once MemberCanBeProtected.Global -- JSON Serialisation
         public ExtensionMethod()
         {
             
@@ -98,8 +98,9 @@ namespace Emma.Core
             return Equals((ExtensionMethod)obj);
         }
 
-        public override int GetHashCode() => ToString().GetHashCode(); 
+        public override int GetHashCode() => ToString().GetHashCode();
 
         #endregion
+        // ReSharper restore MemberCanBeProtected.Global -- JSON Serialisation
     }
 }

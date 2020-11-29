@@ -34,10 +34,10 @@ namespace Emma.Core.Tests
         [Test]
         public void Name_can_search_by_exact()
         {
-            var results = _library.FindByName("ToNowhere");
+            var results = _library.FindByName("ToNowhere", StringMatchMode.Equals);
             results.Count().ShouldBe(2);
 
-            results = _library.FindByName("ToNow");
+            results = _library.FindByName("ToNow", StringMatchMode.Equals);
             results.Count().ShouldBe(0);
         }
 
@@ -64,10 +64,10 @@ namespace Emma.Core.Tests
         [Test]
         public void Name_search_by_substring()
         {
-            var results = _library.FindByName("owhe", StringMatchMode.Contains);
+            var results = _library.FindByName("owhe");
             results.Count().ShouldBe(2);
 
-            results = _library.FindByName("xyz", StringMatchMode.Contains);
+            results = _library.FindByName("xyz");
             results.Count().ShouldBe(0);
         }
 

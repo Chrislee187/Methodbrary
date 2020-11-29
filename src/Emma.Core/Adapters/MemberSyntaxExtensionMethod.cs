@@ -3,7 +3,7 @@ using System.Linq;
 using Emma.Core.Extensions;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Emma.Core
+namespace Emma.Core.Adapters
 {
     internal class MemberSyntaxExtensionMethod : ExtensionMethod
     {
@@ -14,9 +14,8 @@ namespace Emma.Core
                 throw new ArgumentException($"member '{member.Name()}' is not an extension method.");
             }
 
-
-            var extendingType = member.ParameterList.Parameters.First()
-                .Type.Name();
+            var extendingType = member.ParameterList.Parameters
+                .First().Type.Name();
             var returnType = member.ReturnType.Name();
 
             var prms = member.ParameterList.Parameters

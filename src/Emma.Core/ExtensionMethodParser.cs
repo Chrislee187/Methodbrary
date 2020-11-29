@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Emma.Core.Adapters;
 using Emma.Core.Extensions;
 using Emma.Core.Github;
 using Microsoft.CodeAnalysis;
@@ -13,28 +14,23 @@ namespace Emma.Core
 {
     public static class ExtensionMethodParser
     {
-        public static ExtensionMethod Parse(MethodInfo mi, DateTime lastUpdated) => 
+        public static ExtensionMethod Parse(MethodInfo mi, DateTime lastUpdated = default) => 
             new MethodInfoExtensionMethod(mi, lastUpdated);
 
-        public static IEnumerable<ExtensionMethod> Parse(IEnumerable<MethodInfo> mis, DateTime lastUpdated) => 
-            mis.Select(m => ExtensionMethodParser.Parse(m, lastUpdated));
+        public static IEnumerable<ExtensionMethod> Parse(IEnumerable<MethodInfo> mis, DateTime lastUpdated = default) => 
+            mis.Select(m => Parse(m, lastUpdated));
 
-        public static ExtensionMethod[] Parse(Assembly asm) => 
-            asm.ExtensionMethods()
-            .Select(m => Parse(m, new FileInfo(asm.Location).LastWriteTimeUtc))
-            .ToArray();
+        public static IEnumerable<ExtensionMethod> Parse(Assembly asm) => 
+            Parse(asm.ExtensionMethods(), new FileInfo(asm.Location).LastWriteTimeUtc);
 
-        public static ExtensionMethod[] Parse(string sourceCode, string sourceLocation, DateTimeOffset lastUpdated) => 
+        public static IEnumerable<ExtensionMethod> Parse(string sourceCode, string sourceLocation = default, DateTimeOffset lastUpdated = default) => 
             ParseSyntax(
                 CSharpSyntaxTree.ParseText(sourceCode).GetCompilationUnitRoot().Members, 
                 sourceLocation, 
                 lastUpdated);
 
-        public static ExtensionMethod[] Parse(Folder repo)
-        {
-            return ParseGithubFolder(repo)
-                .ToArray();
-        }
+        public static IEnumerable<ExtensionMethod> Parse(Folder repo) => 
+            ParseGithubFolder(repo).ToArray();
 
         private static IEnumerable<ExtensionMethod> ParseGithubFolder(Folder folder)
         {
@@ -45,68 +41,34 @@ namespace Emma.Core
                 list.AddRange(ParseGithubFolder(ghFolder));
             }
 
-            list.AddRange(ParseGithubFiles(folder));
+            list.AddRange(ParseGithubFiles(folder.Files));
 
             return list;
         }
 
-        private static IEnumerable<ExtensionMethod> ParseGithubFiles(Folder folder)
+        private static IEnumerable<ExtensionMethod> ParseGithubFiles(IEnumerable<FileContent> fileContents)
         {
             var list = new List<ExtensionMethod>();
 
-            foreach (var file in folder.Files)
+            foreach (var file in fileContents)
             {
-                if (Path.GetExtension(file.Name)
-                    ?.ToLowerInvariant() == ".cs")
+                if (Path.GetExtension(file.Name)?.ToLowerInvariant() == ".cs")
                 {
                     var text = file.Content;
-                    list.AddRange(ExtensionMethodParser.Parse(text, file.Path, file.LastCommitted));
+                    list.AddRange(Parse(text, file.Path, file.LastCommitted));
                 }
             }
 
             return list;
         }
 
-        private static string _lastClassName = "";
-
-        private static ExtensionMethod[] ParseSyntax(SyntaxList<MemberDeclarationSyntax> members, string sourceLocation,
-            DateTimeOffset lastUpdated)
-        {
-            var ems = new List<ExtensionMethod>();
-            foreach (var memberSyntax in members)
-            {
-                switch (memberSyntax.Kind())
-                {
-                    case SyntaxKind.NamespaceDeclaration:
-                        ems.AddRange(ParseSyntax(((NamespaceDeclarationSyntax) memberSyntax).Members, sourceLocation,
-                            lastUpdated));
-                        break;
-                    case SyntaxKind.ClassDeclaration:
-                        var classDeclarationSyntax = (ClassDeclarationSyntax) memberSyntax;
-                        _lastClassName = classDeclarationSyntax.Identifier.Text;
-                        if (classDeclarationSyntax.IsStatic())
-                        {
-                            ems.AddRange(ParseSyntax(classDeclarationSyntax.Members, sourceLocation, lastUpdated));
-                        }
-
-                        break;
-                    case SyntaxKind.MethodDeclaration:
-                        var method = (MethodDeclarationSyntax) memberSyntax;
-
-                        if (method.IsExtensionMethod())
-                        {
-                            ems.Add(new MemberSyntaxExtensionMethod(method, lastUpdated, _lastClassName, sourceLocation));
-                        }
-
-                        break;
-                }
-            }
-
-            return ems.ToArray();
-        }
-
+        private static IEnumerable<ExtensionMethod> ParseSyntax(
+            SyntaxList<MemberDeclarationSyntax> members, 
+            string sourceLocation,
+            DateTimeOffset lastUpdated) => 
+                new MemberSyntaxListExtensionMethods(members, sourceLocation, lastUpdated).ToArray();
     }
-    
+
     public enum ExtensionMethodSourceType
     {
         Assembly, SourceCode
