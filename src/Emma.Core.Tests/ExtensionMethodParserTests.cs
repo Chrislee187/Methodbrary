@@ -1,10 +1,12 @@
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Emma.Core.Extensions;
-using Emma.Core.Github;
 using Emma.Core.Tests.Support;
 using NUnit.Framework;
+using Octokit;
 using Shouldly;
+using Credentials = Emma.Core.Github.Credentials;
 
 namespace Emma.Core.Tests
 {
@@ -53,28 +55,44 @@ namespace Emma.Core.Tests
         }
 
         [Test, Explicit("Hits the github api, use for debugging/development purposes")]
-        public void Can_parse_github_repo()
+        public async Task Can_parse_github_repo()
         {
-            var user = "chrislee187";
-            var repo = "Emma";
-            var loc = new GithubLocation(user, repo);
-            var gitRoot = new Folder(Credentials.AppKey(), loc);
-            var extensionsFromFolderInGit = ExtensionMethodParser
-                .Parse(gitRoot)
+            var client = new GitHubClient(new ProductHeaderValue("Emma"))
+            {
+                Connection = { Credentials = new Octokit.Credentials(Credentials.AppKey()) }
+            };
+
+            var github = new Core.Github.Github(client);
+
+
+            var username = "chrislee187";
+            var reponame = "Emma";
+            var user = await github.User(username);
+            var repo = await user.Repos(reponame);
+            var main = await repo.Get();
+            
+            var extensionMethods = await ExtensionMethodParser.Parse(main.Root);
+            var extensionsFromFolderInGit = extensionMethods
+                .Where(em => !em.SourceLocation.Contains("Methodbrary"))
                 .OrderBy(i => i.ToString())
                 .ToArray();
 
             var extensionsFromAssemblies = 
                 ExtensionMethodParser.Parse(typeof(ReflectionExtensions).Assembly)
                 .Concat(ExtensionMethodParser.Parse(typeof(SampleExtensionsClass).Assembly))
-                .OrderBy(i => i.ToString())
+                 .OrderBy(i => i.ToString())
                 .ToArray();
 
-            ConsoleX.Dump(extensionsFromFolderInGit, $"From Git: {loc.ToUrl()}");
+            ConsoleX.Dump(extensionsFromFolderInGit, $"From Git: {main.Root}");
             ConsoleX.Dump(extensionsFromAssemblies, $"From Assembly {typeof(ReflectionExtensions).Assembly.Location}");
 
-            extensionsFromFolderInGit.Length
-                .ShouldBe(extensionsFromAssemblies.Length);
+            extensionsFromFolderInGit.Length.ShouldBeGreaterThan(0);
+            extensionsFromAssemblies.Length.ShouldBeGreaterThan(0);
+
+            if (extensionsFromAssemblies.Length != extensionsFromFolderInGit.Length)
+            {
+                Assert.Inconclusive($"Number of methods in Assembly ({extensionsFromAssemblies.Length}) != number of methods in Git folder ({extensionsFromFolderInGit.Length})");
+            }
 
 
         }

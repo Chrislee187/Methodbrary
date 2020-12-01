@@ -13,10 +13,10 @@ namespace Emma.Core.Tests
         [Test]
         public void Initialises()
         {
-            var emSource = new GithubRepoExtensionMethodsSource(GithubClient, 
-                new GithubLocation("chrislee187", "Emma"), 
-                new AppDataExtensionMethodJsonCache(),
-                "github.emma.spike" );
+            var emSource = new GithubRepoExtensionMethodsSource(Github,
+                "github.emma.spike", 
+                "chrislee187", "Emma", 
+                new AppDataExtensionMethodJsonCache());
 
             ConsoleX.Dump(emSource.Methods);
         }

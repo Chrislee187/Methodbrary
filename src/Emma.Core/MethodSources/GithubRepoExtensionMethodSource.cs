@@ -1,21 +1,24 @@
 using Emma.Core.Cache;
 using Emma.Core.Github;
-using Octokit;
 
 namespace Emma.Core.MethodSources
 {
     public class GithubRepoExtensionMethodsSource : ExtensionMethodsSource
     {
-        private readonly GitHubClient _github;
-        private readonly GithubLocation _location;
+
         private readonly ExtensionMethodCache _cache;
+        private readonly IGithub _github;
+        private readonly string _userName;
+        private readonly string _repoName;
 
-        public GithubRepoExtensionMethodsSource(GitHubClient github, GithubLocation location, ExtensionMethodCache cache, string localCacheId)
+        public GithubRepoExtensionMethodsSource(IGithub github, string localCacheId,
+            string userName, string repoName,
+            ExtensionMethodCache cache)
         {
-            _cache = cache;
-            _location = location;
             _github = github;
-
+            _cache = cache;
+            _userName = userName;
+            _repoName = repoName;
             InitCache(localCacheId);
         }
 
@@ -29,8 +32,11 @@ namespace Emma.Core.MethodSources
             else
             {
                 var m = _cache.Get(cacheId);
-                var repo = new Folder(_github, _location);
-                if (repo.LastCommitted > m.LastUpdated)
+                var ghRepository = _github.User(_userName).Result
+                    .Repos(_repoName).Result;
+                
+                var updateCache = ghRepository.UpdatedAt > m.LastUpdated;
+                if (updateCache)
                 {
                     GetExtensionMethodsFromGithub();
                     _cache.Add(cacheId, this);
@@ -43,10 +49,13 @@ namespace Emma.Core.MethodSources
 
         private void GetExtensionMethodsFromGithub()
         {
-            var repo = new Folder(_github, _location);
-
-            Methods = ExtensionMethodParser.Parse(repo);
-            LastUpdated = repo.LastCommitted;
+            // Note: Had probllems when using the Async calls, because of being called from CTOR
+            var user = _github.User(_userName).Result;
+            var repo = user.Repos(_repoName).Result;
+            var defaultBranch = repo.Get().Result;
+            Methods = ExtensionMethodParser.Parse(defaultBranch.Root).Result;
+            LastUpdated = repo.UpdatedAt;
         }
+
     }
 }

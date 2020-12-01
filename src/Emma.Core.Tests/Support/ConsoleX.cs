@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Emma.Core.Github;
 
 namespace Emma.Core.Tests.Support
@@ -8,24 +9,25 @@ namespace Emma.Core.Tests.Support
     {
         private static int _folderDepth;
 
-        public static void Dump(Folder repo)
+        public static async Task DumpGithubFolder(GhFolder repo)
         {
             _folderDepth++;
-            foreach (var folder in repo.Folders)
+            var ghFolders = await repo.Folders();
+
+            foreach (var folder in ghFolders)
             {
                 Console.WriteLine($"{new string('>', _folderDepth)}{folder.Path}");
-                foreach (var file in folder.Files)
+                foreach (var file in await folder.Files())
                 {
 
                     Console.WriteLine($"{new string(' ', _folderDepth)}{file.Path} : {file.Size} content length");
                 }
-                Dump(folder);
+                await DumpGithubFolder(folder);
 
 
             }
             _folderDepth--;
         }
-
         public static void Dump(IEnumerable<ExtensionMethod> methods, string source = null)
         {
             Console.WriteLine();

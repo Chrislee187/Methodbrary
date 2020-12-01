@@ -1,5 +1,6 @@
+using System;
 using System.Linq;
-using Emma.Core.Github;
+using System.Threading.Tasks;
 using Emma.Core.Tests.Support;
 using NUnit.Framework;
 using Shouldly;
@@ -7,7 +8,7 @@ using Shouldly;
 namespace Emma.Core.Tests.Github
 {
     [TestFixture, Explicit]
-    public class GithubRepoFolderTests : GithubTestsBase
+    public class GithubTests : GithubTestsBase
     {
 
         [SetUp]
@@ -16,13 +17,25 @@ namespace Emma.Core.Tests.Github
 
         }
         [Test, Explicit("Hits the github api,use for debugging/development purposes")]
-        public void Can_read_github_folder()
+        public async Task Can_read_github_folder()
         {
-            var repo = new Folder(GithubClient, new GithubLocation("ChrisLee187", "Emma"));
-            var itemCount = (repo.Folders.Count() + repo.Files.Count());
+            var repo = await Github.Repo("chrislee187", "Emma");
+            var defaultBranch = await repo.Get();
+            var itemCount = (await defaultBranch.Root.Folders()).Count() 
+                            + (await defaultBranch.Root.Files()).Count();
             itemCount.ShouldBeGreaterThan(0);
 
-            ConsoleX.Dump(repo);
+            await ConsoleX.DumpGithubFolder(defaultBranch.Root);
+        }
+        [Test, Explicit("Hits the github api,use for debugging/development purposes")]
+        public async Task Can_read_github_file_contents()
+        {
+            var repo = await Github.Repo("chrislee187", "Emma");
+            var defaultBranch = await repo.Get();
+            var gitIgnoreFile = (await defaultBranch.Root.Files()).First(f => f.Path == ".gitignore");
+
+            gitIgnoreFile.Content.ShouldNotBeEmpty();
+            Console.WriteLine(gitIgnoreFile.Content);
         }
     }
 }

@@ -5,8 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DiffEngine" Version="6.4.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
     <PackageReference Include="Octokit" Version="0.48.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Github\Extensions\" />
   </ItemGroup>
 
 </Project>
