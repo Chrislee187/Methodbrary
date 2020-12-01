@@ -14,9 +14,9 @@ namespace Emma.Core.Tests
         public void Setup()
         {
             var source = new GithubRepoExtensionMethodsSource(GithubClient,
-                new GithubLocation("chrislee187", "Emma"),
+                new GithubLocation("chrislee187", "Emma", "Methodbrary"),
                 new AppDataExtensionMethodJsonCache(),
-                "github.emma.spike.emma");
+                "github.emma.spike.Methodbrary");
             _library = new ExtensionMethodLibrary(new ExtensionMethodsSource[] { source });
         }
     }
