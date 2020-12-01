@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Security.Policy;
 using System.Threading.Tasks;
 using Octokit;
 
@@ -9,8 +8,8 @@ namespace Emma.Core.Github
     public class GhFolder
     {
         private readonly IGithub _github;
-        public readonly GhRepository Repository;
-        public readonly GhBranch Branch;
+        public readonly IGhRepository Repository;
+        public readonly IGhBranch Branch;
         public readonly string Path;
 
         public bool CacheContent = true;
@@ -31,16 +30,16 @@ namespace Emma.Core.Github
                 return _folders;
         }
 
-        public GhFolder(IGithub github, GhRepository repository, GhBranch branch)
+        public GhFolder(IGithub github, IGhRepository repository, IGhBranch branch)
         {
+            // NOTE: No path supplied, so gets the root folder of the branch
             Repository = repository;
             Branch = branch;
 
             _github = github;
         }
 
-        private GhFolder(IGithub github, GhRepository repository, GhBranch branch,
-            string path)
+        private GhFolder(IGithub github, IGhRepository repository, IGhBranch branch, string path)
         {
             Repository = repository;
             Branch = branch;
@@ -81,8 +80,8 @@ namespace Emma.Core.Github
 
         public static async Task<IEnumerable<RepositoryContent>> GetContent(
             IGithub github, 
-            GhRepository repository, 
-            GhBranch branch, 
+            IGhRepository repository, 
+            IGhBranch branch, 
             string path = null)
             => await github.ApiClient.Repository.Content
                 .GetAllContentsByRef(repository.Id, path ?? ".", branch.Name);

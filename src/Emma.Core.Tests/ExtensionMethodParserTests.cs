@@ -12,9 +12,17 @@ namespace Emma.Core.Tests
 {
     public class ExtensionMethodParserTests
     {
-        [SetUp]
-        public void Setup()
+        private Core.Github.Github _github;
+
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
+            var client = new GitHubClient(new ProductHeaderValue("Emma"))
+            {
+                Connection = { Credentials = new Octokit.Credentials(Credentials.AppKey()) }
+            };
+
+            _github = new Core.Github.Github(client);
 
         }
 
@@ -22,7 +30,7 @@ namespace Emma.Core.Tests
         public void Can_parse_MethodInfo()
         {
             var type = typeof(SampleExtensionsClass);
-
+            
             var extensionMethodInfos = type
                 .ExtensionMethods()
                 .Select(m => ExtensionMethodParser.Parse(m, new FileInfo(type.Assembly.Location).LastWriteTimeUtc))
@@ -57,19 +65,11 @@ namespace Emma.Core.Tests
         [Test, Explicit("Hits the github api, use for debugging/development purposes")]
         public async Task Can_parse_github_repo()
         {
-            var client = new GitHubClient(new ProductHeaderValue("Emma"))
-            {
-                Connection = { Credentials = new Octokit.Credentials(Credentials.AppKey()) }
-            };
-
-            var github = new Core.Github.Github(client);
-
-
             var username = "chrislee187";
             var reponame = "Emma";
-            var user = await github.User(username);
+            var user = await _github.User(username);
             var repo = await user.Repos(reponame);
-            var main = await repo.Get();
+            var main = await repo.Branch(repo.DefaultBranch);
             
             var extensionMethods = await ExtensionMethodParser.Parse(main.Root);
             var extensionsFromFolderInGit = extensionMethods

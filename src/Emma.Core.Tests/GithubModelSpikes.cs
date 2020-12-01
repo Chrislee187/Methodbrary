@@ -50,7 +50,7 @@ namespace Emma.Core.Tests
 
             Console.WriteLine($"Repo: {repo.Name}");
 
-            foreach (var branch in await repo.All())
+            foreach (var branch in await repo.Branch())
             {
                 Console.WriteLine(branch.Name);
                 Console.WriteLine(branch.Root.Path);

@@ -52,7 +52,7 @@ namespace Emma.Core.MethodSources
             // Note: Had probllems when using the Async calls, because of being called from CTOR
             var user = _github.User(_userName).Result;
             var repo = user.Repos(_repoName).Result;
-            var defaultBranch = repo.Get().Result;
+            var defaultBranch = repo.Branch(repo.DefaultBranch).Result;
             Methods = ExtensionMethodParser.Parse(defaultBranch.Root).Result;
             LastUpdated = repo.UpdatedAt;
         }

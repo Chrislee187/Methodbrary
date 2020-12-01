@@ -5,19 +5,14 @@ using Octokit;
 
 namespace Emma.Core.Github
 {
-    public interface IGhBranch
-    {
-        GhFolder Root { get; }
-    }
-
     public class GhBranch : Branch, IGhBranch
     {
         private readonly IGithub _github;
-        public readonly GhRepository Repository;
+        public readonly IGhRepository Repository;
 
         public GhFolder Root { get; }
 
-        private GhBranch(IGithub github, GhRepository repository, Branch branch) 
+        private GhBranch(IGithub github, IGhRepository repository, Branch branch) 
             : base(branch.Name, branch.Commit, branch.Protected)
         {
             Repository = repository;
@@ -27,13 +22,13 @@ namespace Emma.Core.Github
         }
 
         #region Api Helpers
-        public static async Task<GhBranch> Get(IGithub github, GhRepository repository, string branchName)
+        public static async Task<IGhBranch> Get(IGithub github, GhRepository repository, string branchName)
         {
             return new GhBranch(github, repository,
                 await github.ApiClient.Repository.Branch.Get(repository.Id, branchName));
         }
 
-        public static async Task<IEnumerable<GhBranch>> All(IGithub github, GhRepository repository)
+        public static async Task<IEnumerable<IGhBranch>> All(IGithub github, GhRepository repository)
         {
             return (await github.ApiClient.Repository.Branch.GetAll(repository.Id))
                 .Select(b => new GhBranch(github, repository, b));

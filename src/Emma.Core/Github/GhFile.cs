@@ -8,8 +8,8 @@ namespace Emma.Core.Github
     public class GhFile : RepositoryContent
     {
         private readonly IGithub _github;
-        public readonly GhRepository Repository;
-        public readonly GhBranch Branch;
+        public readonly IGhRepository Repository;
+        public readonly IGhBranch Branch;
 
         private GitHubCommit _lastCommit;
         private readonly Func<GitHubCommit> _lastCommitProvider;
@@ -41,7 +41,7 @@ namespace Emma.Core.Github
             }
         }
 
-        public GhFile(IGithub github, GhRepository repository, GhBranch branch, RepositoryContent content) 
+        public GhFile(IGithub github, IGhRepository repository, IGhBranch branch, RepositoryContent content) 
             : this(content)
         {
             _github = github;
@@ -61,8 +61,8 @@ namespace Emma.Core.Github
         #region Api Helpers
         public static async Task<RepositoryContent> GetContent(
             IGithub github,
-            GhRepository repository,
-            GhBranch branch,
+            IGhRepository repository,
+            IGhBranch branch,
             string path)
             => (await github.ApiClient.Repository.Content
                 .GetAllContentsByRef(repository.Id, path, branch.Name))[0];

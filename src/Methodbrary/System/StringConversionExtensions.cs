@@ -111,13 +111,14 @@ namespace Methodbrary.System
         }
 
 
-        public static string ToValidFilename(this string source, string invalidChars) =>
-            source.ToValidFilename(invalidChars.ToCharArray());
+        public static string ToValidFilename(this string source, string invalidChars)
+            => source.ToValidFilename(invalidChars.ToCharArray());
+
         public static string ToValidFilename(this string source, params char[] invalidChars)
         {
             if (!invalidChars.Any())
             {
-                invalidChars =Path.GetInvalidFileNameChars();
+                invalidChars = Path.GetInvalidFileNameChars();
             }
 
             return source.ReplaceChars(invalidChars);

@@ -1,11 +1,10 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Octokit;
 
 namespace Emma.Core.Github
 {
-    public class GhUser : User
+    public class GhUser : User, IGhUser
     {
         private readonly IGithub _gitHub;
 
@@ -14,10 +13,10 @@ namespace Emma.Core.Github
             _gitHub = gitHub;
         }
 
-        public async Task<IEnumerable<GhRepository>> Repos() => 
-            await GhRepository.All(_gitHub, Login);
+        public async Task<IEnumerable<IGhRepository>> Repos() => 
+            await GhRepository.Branch(_gitHub, Login);
 
-        public async Task<GhRepository> Repos(string repoName) => 
+        public async Task<IGhRepository> Repos(string repoName) => 
             await GhRepository.Get(_gitHub, Login, repoName);
 
         private GhUser(User u) : base(u.AvatarUrl, u.Bio, u.Blog, u.Collaborators ?? 0, u.Company, u.CreatedAt, u.UpdatedAt,
@@ -28,8 +27,9 @@ namespace Emma.Core.Github
         }
 
         #region Api Helpers
-        public static async Task<GhUser> Get(IGithub github, string userName) => 
+        public static async Task<IGhUser> Get(IGithub github, string userName) => 
             new GhUser(github, await github.ApiClient.User.Get(userName));
+
         #endregion
     }
 }

@@ -20,7 +20,7 @@ namespace Emma.Core.Tests.Github
         public async Task Can_read_github_folder()
         {
             var repo = await Github.Repo("chrislee187", "Emma");
-            var defaultBranch = await repo.Get();
+            var defaultBranch = await repo.Branch(repo.DefaultBranch);
             var itemCount = (await defaultBranch.Root.Folders()).Count() 
                             + (await defaultBranch.Root.Files()).Count();
             itemCount.ShouldBeGreaterThan(0);
@@ -31,7 +31,7 @@ namespace Emma.Core.Tests.Github
         public async Task Can_read_github_file_contents()
         {
             var repo = await Github.Repo("chrislee187", "Emma");
-            var defaultBranch = await repo.Get();
+            var defaultBranch = await repo.Branch(repo.DefaultBranch);
             var gitIgnoreFile = (await defaultBranch.Root.Files()).First(f => f.Path == ".gitignore");
 
             gitIgnoreFile.Content.ShouldNotBeEmpty();

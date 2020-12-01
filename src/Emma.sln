@@ -7,10 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Emma.Core", "Emma.Core\Emma
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Emma.Core.Tests", "Emma.Core.Tests\Emma.Core.Tests.csproj", "{A2DC46BF-3660-4865-9635-FAB99B9731FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Methodbrary", "Methodbrary\Methodbrary.csproj", "{31E87401-6E49-4A58-BB95-FF148889FCDD}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Methodbrary.Tests", "Methodbrary.Tests\Methodbrary.Tests.csproj", "{25C4E193-336B-4CB0-86E7-848337571A00}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,14 +21,6 @@ Global
 		{A2DC46BF-3660-4865-9635-FAB99B9731FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2DC46BF-3660-4865-9635-FAB99B9731FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2DC46BF-3660-4865-9635-FAB99B9731FE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{31E87401-6E49-4A58-BB95-FF148889FCDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{31E87401-6E49-4A58-BB95-FF148889FCDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{31E87401-6E49-4A58-BB95-FF148889FCDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{31E87401-6E49-4A58-BB95-FF148889FCDD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{25C4E193-336B-4CB0-86E7-848337571A00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{25C4E193-336B-4CB0-86E7-848337571A00}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{25C4E193-336B-4CB0-86E7-848337571A00}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{25C4E193-336B-4CB0-86E7-848337571A00}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

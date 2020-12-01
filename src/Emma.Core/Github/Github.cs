@@ -13,13 +13,13 @@ namespace Emma.Core.Github
             ApiClient = apiClient;
         }
 
-        public async Task<GhUser> User(string userName) => 
+        public async Task<IGhUser> User(string userName) => 
             await GhUser.Get(this, userName);
 
-        public async Task<GhRepository> Repo(string userName, string repoName) => 
+        public async Task<IGhRepository> Repo(string userName, string repoName) => 
             await GhRepository.Get(this, userName, repoName);
 
-        public Task<GhRepository> Repo(string url)
+        public Task<IGhRepository> Repo(string url)
         {
             throw new NotImplementedException();
         }

@@ -1,5 +1,4 @@
 using Emma.Core.Cache;
-using Emma.Core.Github;
 using Emma.Core.MethodSources;
 using Emma.Core.Tests.Github;
 using Emma.Core.Tests.Support;
@@ -9,7 +8,6 @@ namespace Emma.Core.Tests
 {
     public class GithubRepoExtensionMethodsSourceTest : GithubTestsBase
     {
-
         [Test]
         public void Initialises()
         {
