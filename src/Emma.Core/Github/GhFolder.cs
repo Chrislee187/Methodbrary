@@ -83,8 +83,14 @@ namespace Emma.Core.Github
             IGhRepository repository, 
             IGhBranch branch, 
             string path = null)
-            => await github.ApiClient.Repository.Content
-                .GetAllContentsByRef(repository.Id, path ?? ".", branch.Name);
+        {
+            var (contents, _) = await GhLogging.LogAsyncTask(() =>
+                    github.ApiClient.Repository.Content
+                        .GetAllContentsByRef(repository.Id, path ?? ".", branch.Name),
+                        $"{nameof(Github)}.{nameof(GhFolder)}.{nameof(GetContent)}");
+
+            return contents;
+        }
 
         #endregion
     }

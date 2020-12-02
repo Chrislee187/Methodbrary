@@ -24,14 +24,20 @@ namespace Emma.Core.Github
         #region Api Helpers
         public static async Task<IGhBranch> Get(IGithub github, GhRepository repository, string branchName)
         {
-            return new GhBranch(github, repository,
-                await github.ApiClient.Repository.Branch.Get(repository.Id, branchName));
+            var (branch, _) = await GhLogging.LogAsyncTask(() =>
+                    github.ApiClient.Repository.Branch.Get(repository.Id, branchName),
+                $"{nameof(Github)}.{nameof(GhBranch)}.{nameof(Get)}");
+
+            return new GhBranch(github, repository, branch);
         }
 
         public static async Task<IEnumerable<IGhBranch>> All(IGithub github, GhRepository repository)
         {
-            return (await github.ApiClient.Repository.Branch.GetAll(repository.Id))
-                .Select(b => new GhBranch(github, repository, b));
+            var (all, _) = await GhLogging.LogAsyncTask(() =>
+                    github.ApiClient.Repository.Branch.GetAll(repository.Id),
+                $"{nameof(Github)}.{nameof(GhBranch)}.{nameof(All)}");
+
+            return all.Select(b => new GhBranch(github, repository, b));
         }
 
         #endregion

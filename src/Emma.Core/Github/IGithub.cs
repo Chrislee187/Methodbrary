@@ -7,7 +7,7 @@ namespace Emma.Core.Github
     {
         IGitHubClient ApiClient { get; }
         Task<IGhUser> User(string user);
-        Task<IGhRepository> Repo(string userName, string repoName);
-        Task<IGhRepository> Repo(string url);
+        Task<IGhRepository> Repository(string userName, string repoName);
+        Task<IGhRepository> Repository(string url);
     }
 }

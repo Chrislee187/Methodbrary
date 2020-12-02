@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Octokit;
+using Serilog;
 
 namespace Emma.Core.Github
 {
@@ -18,7 +20,7 @@ namespace Emma.Core.Github
         public async Task<IGhBranch> Branch(string branchName) => 
             await GhBranch.Get(_github, this, branchName ?? DefaultBranch);
 
-        public async Task<IEnumerable<IGhBranch>> Branch() => 
+        public async Task<IEnumerable<IGhBranch>> Branches() => 
             await GhBranch.All(_github, this);
         
         private GhRepository(Repository c) : base(c.Url, c.HtmlUrl, c.CloneUrl, c.GitUrl, c.SshUrl, c.SvnUrl,
@@ -30,14 +32,56 @@ namespace Emma.Core.Github
         }
 
         #region Api Helpers
-        public static async Task<GhRepository> Get(IGithub github, string url) => throw new NotImplementedException();
-        public static async Task<GhRepository> Get(IGithub github, string userName, string repoName) => 
-            new GhRepository(github, await github.ApiClient.Repository.Get(userName, repoName));
+        public static async Task<IGhRepository> Get(IGithub github, string url) => throw new NotImplementedException();
+        public static async Task<IGhRepository> Get(IGithub github, string userName, string repoName)
+        {
+            var (repo, _) = await GhLogging.LogAsyncTask(() =>
+                    github.ApiClient.Repository.Get(userName, repoName),
+                $"{nameof(Github)}.{nameof(GhRepository)}.{nameof(Get)}");
 
-        public static async Task<IEnumerable<IGhRepository>> Branch(IGithub github, string userName) => 
-            (await github.ApiClient.Repository.GetAllForUser(userName))
+            return new GhRepository(github, repo);
+        }
+
+        public static async Task<IEnumerable<IGhRepository>> All(IGithub github, string userName)
+        {
+            var (repos, _) = await GhLogging.LogAsyncTask(() =>
+                    github.ApiClient.Repository.GetAllForUser(userName),
+                $"{nameof(Github)}.{nameof(GhRepository)}.{nameof(All)}");
+
+
+            return repos
                 .Select(r => new GhRepository(github, r));
+        }
 
         #endregion
+    }
+    public static class GhLogging
+    {
+        public static ILogger Logger { get; private set; }
+        public static void SetLogger(ILogger logger) => Logger = logger;
+
+        static GhLogging()
+        {
+            Logger = new LoggerConfiguration()
+                .WriteTo.Console()
+                .CreateLogger();
+        }
+
+        public static async Task<(T, TimeSpan)> LogAsyncTask<T>(Func<Task<T>> asyncCall, string taskDescription)
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+
+            var result = await asyncCall();
+
+            var elapsed = sw.Elapsed;
+            LogDuration(taskDescription, elapsed);
+            return (result, elapsed);
+        }
+
+        public static void LogDuration(string task, TimeSpan duration)
+        {
+            Logger.Information("{task} took {duration}ms", task, duration.TotalMilliseconds.ToString("#"));
+        }
     }
 }

@@ -1,16 +1,15 @@
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Emma.Core.Tests.Github;
-using Emma.Core.Tests.Support;
 using NUnit.Framework;
+using Shouldly;
 
 namespace Emma.Core.Tests
 {
     public class GithubModelSpikes : GithubTestsBase
     {
-        private const string Username = "chrislee187";
-        private const string Repo = "Emma";
+        private const string Login = "chrislee187";
+        private const string RepoName = "Emma";
         private Core.Github.Github _github;
 
         [OneTimeSetUp]
@@ -23,39 +22,27 @@ namespace Emma.Core.Tests
         [Test]
         public async Task GetAGithubUser()
         {
-            var sw = new Stopwatch();
-            sw.Start();
-            var user = await _github.User(Username);
+            var user = await _github.User(Login);
 
-            Console.WriteLine($"Github User: {user.Login} ({user.Name}) #{user.PublicRepos} public repos");
-            foreach (var repo in await user.Repos())
-            {
-                Console.WriteLine($"{repo.Name} - {repo.DefaultBranch} - {repo.PushedAt}");
-            }
-
-            Console.WriteLine(sw.Elapsed);
-            sw.Restart();
-
-            foreach (var repo in await user.Repos())
-            {
-                Console.WriteLine($"{repo.Name} - {repo.DefaultBranch} - {repo.PushedAt}");
-            }
-            Console.WriteLine(sw.Elapsed);
+            user.Login.ShouldBe("Chrislee187");
         }
 
-        [Test, Explicit]
+        [Test]
         public async Task GetARepo()
         {
-            var repo = await _github.Repo(Username, Repo);
+            var repo = await _github.Repository(Login, RepoName);
 
-            Console.WriteLine($"Repo: {repo.Name}");
+            repo.Name.ShouldBe(RepoName);
+            repo.PushedAt.HasValue.ShouldBeTrue();
+            repo.PushedAt.Value.ShouldBeGreaterThan(DateTimeOffset.MinValue);
+        }
+        [Test]
+        public async Task GetDefaultBranch()
+        {
+            var repo = await _github.Repository(Login, RepoName);
+            var branch = await repo.Branch(repo.DefaultBranch);
 
-            foreach (var branch in await repo.Branch())
-            {
-                Console.WriteLine(branch.Name);
-                Console.WriteLine(branch.Root.Path);
-                await ConsoleX.DumpGithubFolder(branch.Root);
-            }
+            branch.Name.ShouldBe("main");
         }
     }
 }

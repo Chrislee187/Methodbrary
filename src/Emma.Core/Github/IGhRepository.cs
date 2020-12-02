@@ -7,7 +7,7 @@ namespace Emma.Core.Github
     public interface IGhRepository
     {
         Task<IGhBranch> Branch(string branchName);
-        Task<IEnumerable<IGhBranch>> Branch();
+        Task<IEnumerable<IGhBranch>> Branches();
 
         long Id { get; }
 

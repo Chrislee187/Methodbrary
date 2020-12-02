@@ -14,7 +14,7 @@ namespace Emma.Core.Github
         }
 
         public async Task<IEnumerable<IGhRepository>> Repos() => 
-            await GhRepository.Branch(_gitHub, Login);
+            await GhRepository.All(_gitHub, Login);
 
         public async Task<IGhRepository> Repos(string repoName) => 
             await GhRepository.Get(_gitHub, Login, repoName);
@@ -27,9 +27,16 @@ namespace Emma.Core.Github
         }
 
         #region Api Helpers
-        public static async Task<IGhUser> Get(IGithub github, string userName) => 
-            new GhUser(github, await github.ApiClient.User.Get(userName));
+        public static async Task<IGhUser> Get(IGithub github, string userName)
+        {
+            var (user, _)= await GhLogging.LogAsyncTask(() => 
+                github.ApiClient.User.Get(userName),
+                    $"{nameof(Github)}.{nameof(GhUser)}.{nameof(Get)}");
+
+            return new GhUser(github, user);
+        }
 
         #endregion
     }
+
 }
