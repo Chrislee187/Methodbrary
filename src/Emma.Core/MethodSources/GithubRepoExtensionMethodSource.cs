@@ -1,5 +1,5 @@
 using Emma.Core.Cache;
-using Emma.Core.Github;
+using GithubRepositoryModel;
 
 namespace Emma.Core.MethodSources
 {

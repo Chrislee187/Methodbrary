@@ -1,20 +1,22 @@
+using GithubRepositoryModel;
 using Octokit;
 
-namespace Emma.Core.Tests.Github
+
+namespace GithubRepositoryModel.Tests.GithubRepoModel
 {
     public class GithubTestsBase
     {
         protected readonly GitHubClient ApiClient;
-        protected Core.Github.Github Github;
+        protected IGithub Github;
 
         public GithubTestsBase()
         {
             ApiClient = new GitHubClient(new ProductHeaderValue("EmmaTests"))
             {
-                Connection = { Credentials = new Credentials( Emma.Core.Github.Credentials.AppKey()) }
+                Connection = { Credentials = new Octokit.Credentials(Credentials.AppKey()) }
             };
 
-            Github = new Core.Github.Github(ApiClient);
+            Github = new Github(ApiClient);
         }
     }
 }

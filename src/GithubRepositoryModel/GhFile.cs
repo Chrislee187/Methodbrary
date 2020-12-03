@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Octokit;
 
-namespace Emma.Core.Github
+namespace GithubRepositoryModel
 {
     public class GhFile : RepositoryContent
     {

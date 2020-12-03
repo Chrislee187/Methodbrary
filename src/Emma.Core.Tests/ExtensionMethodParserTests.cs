@@ -3,16 +3,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using Emma.Core.Extensions;
 using Emma.Core.Tests.Support;
+using GithubRepositoryModel;
 using NUnit.Framework;
 using Octokit;
 using Shouldly;
-using Credentials = Emma.Core.Github.Credentials;
+
 
 namespace Emma.Core.Tests
 {
     public class ExtensionMethodParserTests
     {
-        private Core.Github.Github _github;
+        private IGithub _github;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -22,7 +23,7 @@ namespace Emma.Core.Tests
                 Connection = { Credentials = new Octokit.Credentials(Credentials.AppKey()) }
             };
 
-            _github = new Core.Github.Github(client);
+            _github = new GithubRepositoryModel.Github(client);
 
         }
 

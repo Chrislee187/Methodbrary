@@ -1,9 +1,8 @@
 using System;
 using System.Threading.Tasks;
-
 using Octokit;
 
-namespace Emma.Core.Github
+namespace GithubRepositoryModel
 {
     public class Github : IGithub
     {

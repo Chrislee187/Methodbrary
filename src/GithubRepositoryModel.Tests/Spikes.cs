@@ -1,11 +1,10 @@
+using GithubRepositoryModel.Tests.GithubRepoModel;
 using NUnit.Framework;
 
 namespace Emma.Core.Tests
 {
-    public class Spikes
+    public class Spikes : GithubTestsBase
     {
-
-
         [SetUp]
         public void Setup()
         {
@@ -17,6 +16,5 @@ namespace Emma.Core.Tests
         {
 
         }
-
     }
 }

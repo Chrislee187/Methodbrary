@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Emma.Core.Extensions;
 using Emma.Core.MethodSources;
-using Emma.Core.Tests.Github;
 using Emma.Core.Tests.Support;
 using NUnit.Framework;
 using Shouldly;
 
 namespace Emma.Core.Tests
 {
-    public class ExtensionMethodLibraryTests : GithubTestsBase
+    public class ExtensionMethodLibraryTests
     {
         private ExtensionMethodLibrary _library;
 

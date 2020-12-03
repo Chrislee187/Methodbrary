@@ -1,6 +1,6 @@
 using Octokit;
 
-namespace Emma.Core.Github
+namespace GithubRepositoryModel
 {
     public class CommitRequestFilter
     {

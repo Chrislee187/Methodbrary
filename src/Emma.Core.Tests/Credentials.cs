@@ -1,6 +1,6 @@
 using System;
 
-namespace Emma.Core.Github
+namespace Emma.Core.Tests
 {
     public class Credentials
     {

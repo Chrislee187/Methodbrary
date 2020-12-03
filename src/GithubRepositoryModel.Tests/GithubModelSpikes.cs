@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using Emma.Core.Tests.Github;
+using GithubRepositoryModel;
+using GithubRepositoryModel.Tests.GithubRepoModel;
 using NUnit.Framework;
 using Shouldly;
 
@@ -10,12 +11,12 @@ namespace Emma.Core.Tests
     {
         private const string Login = "chrislee187";
         private const string RepoName = "Emma";
-        private Core.Github.Github _github;
+        private IGithub _github;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            _github = new Core.Github.Github(ApiClient);
+            _github = new GithubRepositoryModel.Github(ApiClient);
         }
 
 

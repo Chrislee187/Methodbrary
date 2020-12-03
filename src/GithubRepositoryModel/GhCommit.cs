@@ -1,4 +1,4 @@
-namespace Emma.Core.Github
+namespace GithubRepositoryModel
 {
     public class GhCommit
     {

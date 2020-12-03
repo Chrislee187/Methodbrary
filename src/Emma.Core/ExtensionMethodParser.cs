@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Emma.Core.Adapters;
 using Emma.Core.Extensions;
-using Emma.Core.Github;
+using GithubRepositoryModel;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;

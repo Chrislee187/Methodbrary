@@ -1,7 +1,7 @@
 using System;
 using Octokit;
 
-namespace Emma.Core.Github
+namespace GithubRepositoryModel
 {
     public interface ICommitInfo
     {

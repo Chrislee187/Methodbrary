@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Emma.Core.Github
+namespace GithubRepositoryModel
 {
     public interface IGhRepository
     {
