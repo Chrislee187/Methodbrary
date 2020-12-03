@@ -37,13 +37,13 @@ namespace Emma.Core
         {
             var list = new List<ExtensionMethod>();
 
-            var ghFolders = await folder.Folders();
+            var ghFolders = await folder.GetFolders();
             foreach (var ghFolder in ghFolders)
             {
                 list.AddRange(await ParseGithubFolder(ghFolder));
             }
 
-            var fileContents = await folder.Files();
+            var fileContents = await folder.GetFiles();
             list.AddRange(ParseGithubFiles(fileContents));
 
             return list;

@@ -1,7 +1,7 @@
 using GithubRepositoryModel.Tests.GithubRepoModel;
 using NUnit.Framework;
 
-namespace Emma.Core.Tests
+namespace GithubRepositoryModel.Tests
 {
     public class Spikes : GithubTestsBase
     {
@@ -11,7 +11,7 @@ namespace Emma.Core.Tests
 
         }
 
-        [Test, Explicit]
+        [Test]
         public void Spike()
         {
 

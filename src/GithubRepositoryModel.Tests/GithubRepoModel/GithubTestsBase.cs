@@ -1,4 +1,3 @@
-using GithubRepositoryModel;
 using Octokit;
 
 

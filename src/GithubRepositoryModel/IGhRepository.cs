@@ -6,8 +6,8 @@ namespace GithubRepositoryModel
 {
     public interface IGhRepository
     {
-        Task<IGhBranch> Branch(string branchName);
-        Task<IEnumerable<IGhBranch>> Branches();
+        Task<IGhBranch> GetBranch(string branchName);
+        Task<IEnumerable<IGhBranch>> GetBranches();
 
         long Id { get; }
 

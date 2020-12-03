@@ -12,12 +12,12 @@ namespace Emma.Core.Tests.Support
         public static async Task DumpGithubFolder(GhFolder repo)
         {
             _folderDepth++;
-            var ghFolders = await repo.Folders();
+            var ghFolders = await repo.GetFolders();
 
             foreach (var folder in ghFolders)
             {
                 Console.WriteLine($"{new string('>', _folderDepth)}{folder.Path}");
-                foreach (var file in await folder.Files())
+                foreach (var file in await folder.GetFiles())
                 {
 
                     Console.WriteLine($"{new string(' ', _folderDepth)}{file.Path} : {file.Size} content length");

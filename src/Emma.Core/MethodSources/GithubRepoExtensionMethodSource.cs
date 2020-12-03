@@ -33,7 +33,7 @@ namespace Emma.Core.MethodSources
             {
                 var m = _cache.Get(cacheId);
                 var ghRepository = _github.User(_userName).Result
-                    .Repos(_repoName).Result;
+                    .GetRepository(_repoName).Result;
                 
                 var updateCache = ghRepository.UpdatedAt > m.LastUpdated;
                 if (updateCache)
@@ -51,8 +51,8 @@ namespace Emma.Core.MethodSources
         {
             // Note: Had probllems when using the Async calls, because of being called from CTOR
             var user = _github.User(_userName).Result;
-            var repo = user.Repos(_repoName).Result;
-            var defaultBranch = repo.Branch(repo.DefaultBranch).Result;
+            var repo = user.GetRepository(_repoName).Result;
+            var defaultBranch = repo.GetBranch(repo.DefaultBranch).Result;
             Methods = ExtensionMethodParser.Parse(defaultBranch.Root).Result;
             LastUpdated = repo.UpdatedAt;
         }

@@ -13,10 +13,10 @@ namespace GithubRepositoryModel
             _gitHub = gitHub;
         }
 
-        public async Task<IEnumerable<IGhRepository>> Repos() => 
+        public async Task<IEnumerable<IGhRepository>> GetRepositories() => 
             await GhRepository.All(_gitHub, Login);
 
-        public async Task<IGhRepository> Repos(string repoName) => 
+        public async Task<IGhRepository> GetRepository(string repoName) => 
             await GhRepository.Get(_gitHub, Login, repoName);
 
         private GhUser(User u) : base(u.AvatarUrl, u.Bio, u.Blog, u.Collaborators ?? 0, u.Company, u.CreatedAt, u.UpdatedAt,

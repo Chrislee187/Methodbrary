@@ -15,7 +15,7 @@ namespace GithubRepositoryModel
         public bool CacheContent = true;
 
         private readonly List<GhFile> _files = new List<GhFile>();
-        public async Task<IEnumerable<GhFile>> Files()
+        public async Task<IEnumerable<GhFile>> GetFiles()
         {
                 await UpdateCachedFolders();
 
@@ -23,7 +23,7 @@ namespace GithubRepositoryModel
         }
 
         private readonly List<GhFolder> _folders = new List<GhFolder>();
-        public async Task<IEnumerable<GhFolder>> Folders()
+        public async Task<IEnumerable<GhFolder>> GetFolders()
         {
                 await UpdateCachedFolders();
 
@@ -32,10 +32,8 @@ namespace GithubRepositoryModel
 
         public GhFolder(IGithub github, IGhRepository repository, IGhBranch branch)
         {
-            // NOTE: No path supplied, so gets the root folder of the branch
             Repository = repository;
             Branch = branch;
-
             _github = github;
         }
 

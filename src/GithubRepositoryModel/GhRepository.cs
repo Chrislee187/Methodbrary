@@ -18,10 +18,10 @@ namespace GithubRepositoryModel
 
         // TODO: Commits - github.ApiClient.Repository.Commit.
 
-        public async Task<IGhBranch> Branch(string branchName) => 
+        public async Task<IGhBranch> GetBranch(string branchName) => 
             await GhBranch.Get(_github, this, branchName ?? DefaultBranch);
 
-        public async Task<IEnumerable<IGhBranch>> Branches() => 
+        public async Task<IEnumerable<IGhBranch>> GetBranches() => 
             await GhBranch.All(_github, this);
         
         private GhRepository(Repository c) : base(c.Url, c.HtmlUrl, c.CloneUrl, c.GitUrl, c.SshUrl, c.SvnUrl,

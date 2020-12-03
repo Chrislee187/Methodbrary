@@ -8,7 +8,6 @@ using NUnit.Framework;
 using Octokit;
 using Shouldly;
 
-
 namespace Emma.Core.Tests
 {
     public class ExtensionMethodParserTests
@@ -63,18 +62,18 @@ namespace Emma.Core.Tests
 
         }
 
-        [Test, Explicit("Hits the github api, use for debugging/development purposes")]
+        [Test, Explicit("Slow, Hits the github api, use for debugging/development purposes")]
         public async Task Can_parse_github_repo()
         {
             var username = "chrislee187";
             var reponame = "Emma";
             var user = await _github.User(username);
-            var repo = await user.Repos(reponame);
-            var main = await repo.Branch(repo.DefaultBranch);
+            var repo = await user.GetRepository(reponame);
+            var main = await repo.GetBranch(repo.DefaultBranch);
             
             var extensionMethods = await ExtensionMethodParser.Parse(main.Root);
             var extensionsFromFolderInGit = extensionMethods
-                .Where(em => !em.SourceLocation.Contains("Methodbrary"))
+                .Where(em => em.SourceLocation.Contains("Emma"))
                 .OrderBy(i => i.ToString())
                 .ToArray();
 
