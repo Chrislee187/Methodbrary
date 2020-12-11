@@ -19,19 +19,13 @@ namespace Methodbrary.System.IO
 
             return (byte)@byte;
         }
-        public static byte[] ToArray(this Stream stream)
+
+        public static byte[] ToByteArray(this Stream stream)
         {
-            var buffer = new byte[32768];
-            using (var ms = new MemoryStream())
-            {
-                while (true)
-                {
-                    var read = stream.Read(buffer, 0, buffer.Length);
-                    if (read <= 0)
-                        return ms.ToArray();
-                    ms.Write(buffer, 0, read);
-                }
-            }
+            var buffer = new byte[stream.Length];
+            stream.Seek(0, SeekOrigin.Begin);
+            stream.Read(buffer, 0, (int)stream.Length);
+            return buffer;
         }
     }
 

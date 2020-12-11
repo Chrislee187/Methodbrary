@@ -10,7 +10,6 @@ namespace Methodbrary.System
     /// </summary>
     public static class StringConversionExtensions
     {
-        private static readonly char[] EndOfLineChars = {'\r', '\n'};
 
         public static int ToInt(this string value, int @default = 0)
             => int.TryParse(value, out var result) ? result : @default;
@@ -51,8 +50,22 @@ namespace Methodbrary.System
                 writer.Flush();
                 stream.Position = 0;
             }
-
             return stream;
+        }
+
+        public static MemoryStream ToMemoryStream(this string value)
+        {
+            byte[] testBytes = value.ToBytes();
+
+            MemoryStream memStream = new MemoryStream(testBytes.Length);
+            memStream.Write(testBytes, 0, testBytes.Length);
+            memStream.Seek(0, SeekOrigin.Begin);
+            return memStream;
+        }
+
+        public static T ToEnum<T>(this string value)
+        {
+            return (T)Enum.Parse(typeof(T), value, true);
         }
 
         public static StreamReader ToStreamReader(this string source) => new StreamReader(source.ToStream());
@@ -84,10 +97,19 @@ namespace Methodbrary.System
         /// Searchs for the default static TryParse(string, out T) that exists on many .NET types to
         /// dynamically convert a string to any type.
         /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static T UseTryParse<T>(this string value) => (T) value.UseTryParse(typeof(T));
+
+        /// <summary>
+        /// Searchs for the default static TryParse(value, out type) that exists on many .NET types to
+        /// dynamically convert a string to any type.
+        /// </summary>
         /// <param name="value"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static object ToTypeInstance(this string value, Type type)
+        public static object UseTryParse(this string value, Type type)
         {
             if (type == typeof(string)) return value;
 
@@ -122,6 +144,16 @@ namespace Methodbrary.System
             }
 
             return source.ReplaceChars(invalidChars);
+        }
+
+
+        public static IEnumerable<string> Split(this string str, int partLength)
+        {
+            if (str == null) throw new ArgumentNullException(nameof(str));
+            if (partLength <= 0) throw new ArgumentOutOfRangeException(nameof(partLength),"Part length has to be positive.");
+
+            for (var i = 0; i < str.Length; i += partLength)
+                yield return str.Substring(i, Math.Min(partLength, str.Length - i));
         }
     }
 }

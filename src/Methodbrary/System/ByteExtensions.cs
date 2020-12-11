@@ -37,5 +37,26 @@ namespace Methodbrary.System
             // Are these the right way round lol?
             return bigendian ? bytes[0] * 256 + bytes[1] : bytes[1] * 256 + bytes[0];
         }
+
+        public static ushort GetUShort(this Span<byte> bytes)
+            => (ushort)(bytes[0] << 8 | bytes[1]);
+
+        public static void SetUShort(this Span<byte> buffer, ushort value)
+        {
+            buffer[0] = (byte)(value >> 8);
+            buffer[1] = (byte)(value >> 0);
+        }
+        
+        public static void SetUInt(this Span<byte> buffer, uint value)
+        {
+            buffer[0] = (byte)(value >> 24);
+            buffer[1] = (byte)(value >> 16);
+            buffer[2] = (byte)(value >> 8);
+            buffer[3] = (byte)(value >> 0);
+        }
+        
+        public static uint GetUInt(this Span<byte> bytes)
+            => (uint)(bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3]);
+
     }
 }

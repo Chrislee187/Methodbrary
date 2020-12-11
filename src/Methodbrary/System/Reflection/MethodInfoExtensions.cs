@@ -6,10 +6,8 @@ using System.Runtime.CompilerServices;
 
 namespace Methodbrary.System.Reflection
 {
-    public static class ReflectionExtensions
+    public static class MethodInfoExtensions
     {
-        public static bool IsStatic(this Type type) => type.IsAbstract && type.IsSealed;
-
         public static IEnumerable<MethodInfo> ExtensionMethods(this Type type)
         {
             if (!type.IsStatic()) return new MethodInfo[] { };
