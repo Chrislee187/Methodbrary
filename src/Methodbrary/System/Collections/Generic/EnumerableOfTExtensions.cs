@@ -25,6 +25,9 @@ namespace Methodbrary.System.Collections.Generic
         public static bool None<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> selector)
             => !source.Any(selector);
 
+        public static string ToString<TSource>(this IEnumerable<TSource> list, string delimiter = ", ") =>
+            string.Join(delimiter, list.Select(i => i.ToString()));
+
         public static IEnumerable<string> ToStrings<TSource>(this IEnumerable<TSource> source)
             => source.Select(i => i.ToString());
 
@@ -69,9 +72,6 @@ namespace Methodbrary.System.Collections.Generic
 
             return list.FirstOrDefault(s => selector(s) == max);
         }
-
-        public static string ToString<TSource>(this IEnumerable<TSource> list, string delimiter = ", ") => 
-            string.Join(delimiter, list.Select(i => i.ToString()));
 
     }
 }

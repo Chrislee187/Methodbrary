@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using NUnit.Framework;
 
 namespace Methodbrary.Tests
@@ -12,7 +14,10 @@ namespace Methodbrary.Tests
         [Test]
         public void Test1()
         {
-            Assert.Pass();
+            var value = "()".Aggregate(0, (a, c) => a < 0 ? 0 : c == '(' ? a+1 : c == ')' ? a-1 : 0);
+
+            // var value = ")(()))".Select(c => c == '(' ? 1 : c == ')' ? -1 : 0).Sum() == 0;
+            Console.WriteLine(value);
         }
     }
 }
